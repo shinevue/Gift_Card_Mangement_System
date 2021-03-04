@@ -1,0 +1,9 @@
+{% extends 'core/index.html' %}
+{% block title %}GC Denomination Select{% endblock %}
+{% block content %}
+<div class="text-center">
+{% for denomination in denominations %}
+  <a href="{% url 'gc-redirect' denomination=denomination.denomination %}"><h1 class="my-4">{{ denomination.denomination }}</h1></a>
+{% endfor %}
+</div>
+{% endblock %}

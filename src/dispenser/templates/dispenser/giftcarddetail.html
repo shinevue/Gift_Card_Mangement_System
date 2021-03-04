@@ -1,0 +1,11 @@
+{% extends "core/index.html" %}
+{% block title %}GC Details{% endblock %}
+{% block content %}
+<form method="post">
+{% csrf_token %} {% load crispy_forms_tags %}
+{{ form|crispy }}
+    <div class="text-center">
+        <button type="submit" class="btn btn-primary rounded-pill">MARK USED</button>
+    </div>
+</form>
+{% endblock %}

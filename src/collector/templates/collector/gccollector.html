@@ -1,0 +1,19 @@
+{% extends 'core/index.html' %}
+{% block title %}GC Collector{% endblock %}
+{% if messages %}
+<div class="alert alert-primary" role="alert">
+    {% for message in messages %}
+    {{ message }}
+    {% endfor %}
+</div>
+{% endif %}
+{% block content %}
+{% load crispy_forms_tags %}
+<form method="post">
+{% csrf_token %}
+{{ form|crispy }}
+    <div class="text-center">
+        <button type="submit" class="btn btn-primary rounded-pill">ADD GIFT CARD</button>
+    </div>
+</form>
+{% endblock %}
