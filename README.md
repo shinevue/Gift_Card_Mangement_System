@@ -7,7 +7,7 @@ A Gift Card Management System
 * [Why is this needed?](#why-is-this-needed)  
 * [What does this solve?](#what-does-it-solve) 
 * [Who is this intended for?](#who-is-this-intended-for)  
-* [Setup](#null)
+* [Setup](#setup)
 * [Caveats](#caveats)
   
 ## What is this?  
