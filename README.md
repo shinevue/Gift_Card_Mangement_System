@@ -8,6 +8,7 @@ A Gift Card Management System
 * [What does this solve?](#what-does-it-solve) 
 * [Who is this intended for?](#who-is-this-intended-for)  
 * [Setup](#setup)
+* [Image Gallery](#image-gallery)
 * [Caveats](#caveats)
   
 ## What is this?  
@@ -69,9 +70,13 @@ lsof -ti :8000 | xargs kill -9
 ```
 
 ## Image Gallery
-![Index](miscellaneous/Index.jpg)\
-![DenominationSelect](miscellaneous/DenominationSelect.jpg)\
-![GCDetail](miscellaneous/GCDetail.jpg)\
+
+![Index](miscellaneous/Index.jpg)
+
+![DenominationSelect](miscellaneous/DenominationSelect.jpg)
+
+![GCDetail](miscellaneous/GCDetail.jpg)
+
 ![AddGC](miscellaneous/AddGC.jpg)
 
 ## Caveats
