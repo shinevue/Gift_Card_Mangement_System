@@ -11,11 +11,19 @@ class DenominationSelectView(TemplateView):
     """."""
 
     template_name = "dispenser/denominationselect.html"
-    extra_context = {
-        "denominations": GiftCardInformation.objects.filter(is_used=False)
-        .values("denomination")
-        .annotate(denomination_count=Count("denomination"))
-    }
+
+    def get_context_data(self, **kwargs):
+        """."""
+
+        context = super().get_context_data(**kwargs)
+        context.update(
+            {
+                "denominations": GiftCardInformation.objects.filter(is_used=False)
+                .values("denomination")
+                .annotate(denomination_count=Count("denomination"))
+            }
+        )
+        return context
 
 
 class GiftCardDetailRedirectView(RedirectView):
