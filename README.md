@@ -68,5 +68,11 @@ Visit localhost:8000 or 127.0.0.1:8000 on your browser to use the application
 lsof -ti :8000 | xargs kill -9
 ```
 
+## Image Gallery
+![Index](miscellaneous/Index.jpg)\
+![DenominationSelect](miscellaneous/DenominationSelect.jpg)\
+![GCDetail](miscellaneous/GCDetail.jpg)\
+![AddGC](miscellaneous/AddGC.jpg)
+
 ## Caveats
 * This application was made keeping **AMAZON** brand in mind, but can be used for other brands that use **PIN** & **Redeem Code**.
