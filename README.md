@@ -11,7 +11,7 @@ A Gift Card Management System
 * [Caveats](#caveats)
   
 ## What is this?  
-This is a gift card management system, made to manage your gift cards in an hassle free way. Say goodbye to those pesky spreadsheets.  
+This is a gift card management system, made to manage your gift cards in an hassle free way. Say goodbye to those pesky spreadsheets!  
   
 ## Why is this needed?  
 I was having a really hard time managing my gift card collection in a spreadsheet, i always needed to fill in all the information by hand like the date of purchase, denomination, source etc and honestly it never felt intuitive to me and was becoming a lot of work that was hard to maintain.   
