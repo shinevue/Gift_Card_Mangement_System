@@ -10,5 +10,5 @@ class AllGiftCardsTable(tables.Table):
         model = GiftCardInformation
         row_attrs = {"data-id": lambda record: record.pk}
         empty_text = "Oops! No gift cards found!"
-        order_by = "-date_of_purchase"
+        order_by = ("is_used", "-date_of_purchase")
         exclude = ("id",)
