@@ -1,9 +1,13 @@
 {% extends 'core/index.html' %}
 {% block title %}GC Denomination Select{% endblock %}
 {% block content %}
+{% load humanize %}
 <div class="text-center">
+  {% if not denominations %}
+    <h1 class="my-4">Oops! No Gift Cards to dispense!</h1>
+  {% endif %}
 {% for denomination in denominations %}
-  <a href="{% url 'gc-redirect' denomination=denomination.denomination %}"><h1 class="my-4">{{ denomination.denomination }}</h1></a>
+  <a href="{% url 'gc-redirect' denomination=denomination.denomination %}"><h1 class="my-4">{{ denomination.denomination|intcomma }}</h1></a>
 {% endfor %}
 </div>
 {% endblock %}
