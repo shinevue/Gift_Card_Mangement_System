@@ -46,7 +46,9 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    "django.contrib.humanize",
     "crispy_forms",
+    "django_tables2",
     "core",
     "dispenser",
     "collector",
@@ -64,6 +66,9 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = "giftcardmanager.urls"
 
+SHORT_DATE_FORMAT = "d-m-Y"
+SHORT_DATETIME_FORMAT = f"{SHORT_DATE_FORMAT} g:h:s A"
+
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
@@ -75,6 +80,7 @@ TEMPLATES = [
                 "django.template.context_processors.request",
                 "django.contrib.auth.context_processors.auth",
                 "django.contrib.messages.context_processors.messages",
+                "django.template.context_processors.request",
                 "giftcardmanager.context_processors.asset_information",
             ],
         },
@@ -84,6 +90,8 @@ TEMPLATES = [
 WSGI_APPLICATION = "giftcardmanager.wsgi.application"
 
 CRISPY_TEMPLATE_PACK = "bootstrap4"
+
+DJANGO_TABLES2_TEMPLATE = "django_tables2/bootstrap4.html"
 
 # Database
 # https://docs.djangoproject.com/en/2.2/ref/settings/#databases
@@ -118,7 +126,7 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/2.2/topics/i18n/
 
-LANGUAGE_CODE = "en-us"
+LANGUAGE_CODE = "en-IN"
 
 TIME_ZONE = "Asia/Kolkata"
 
