@@ -1,12 +1,13 @@
 {% extends "core/base.html" %}
+{% load humanize %}
 {% block title %}GC Manager{% endblock %}
-{% block unused_asset %}{{ unused_asset }}{% endblock %}
-{% block used_asset %}{{ used_asset }}{% endblock %}
-{% block total_asset %}{{ total_asset }}{% endblock %}
+{% block unused_asset %}{{ unused_asset|intcomma }}{% endblock %}
+{% block used_asset %}{{ used_asset|intcomma }}{% endblock %}
+{% block total_asset %}{{ total_asset|intcomma }}{% endblock %}
 {% block content %}
 <div class="d-flex justify-content-around btn-group-vertical">
   <a class="btn btn-primary btn-sm rounded-pill my-5" href="{% url 'gc-collector' %}" role="button">ADD</a>
   <a class="btn btn-primary btn-sm rounded-pill my-5" href="{% url 'denomination-select' %}" role="button">DISPENSE</a>
-<!--  <a class="btn btn-primary btn-sm rounded-pill my-5" href="#" role="button">ALL GIFT CARDS</a>-->
+  <a class="btn btn-primary btn-sm rounded-pill my-5" href="{% url 'all-gift-cards' %}" role="button">ALL GIFT CARDS</a>
 </div>
 {% endblock %}
