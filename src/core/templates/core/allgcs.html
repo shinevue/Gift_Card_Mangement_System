@@ -1,0 +1,7 @@
+{% extends 'core/index.html' %}
+{% block title %}All Gift Cards{% endblock %}
+{% block content %}
+{% load humanize %}
+{% load django_tables2 %}
+{% render_table table %}
+{% endblock %}
