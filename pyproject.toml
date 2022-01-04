@@ -1,0 +1,24 @@
+[tool.poetry]
+name = "gcmanager"
+version = "0.1.0"
+description = "A Gift Card Management System"
+authors = ["Vishal Tanwar <vishal.tanwar@outlook.com>"]
+license = "MIT"
+
+[tool.poetry.dependencies]
+python = "3.9.9"
+kink = "^0.6.2"
+Flask = "^2.0.2"
+
+[tool.poetry.dev-dependencies]
+coverage = "^6.2"
+black = "^21.12b0"
+isort = "^5.10.1"
+flake8 = "^4.0.1"
+bandit = "^1.7.1"
+add-trailing-comma = "^2.2.1"
+mypy = "^0.930"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
