@@ -22,8 +22,6 @@ jobs:
         with:
           version: 1.1.12
           virtualenvs-create: false
-          virtualenvs-in-project: false
-          installer-parallel: true
       - name: Install Dependencies
         run: poetry install --no-root --no-interaction
       - name: Style Check (black)
