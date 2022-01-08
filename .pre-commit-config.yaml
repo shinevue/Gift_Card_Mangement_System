@@ -1,0 +1,39 @@
+fail_fast: true
+default_language_version:
+    python: python3.10.0
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.1.0
+    hooks:
+      - id: no-commit-to-branch
+        name: Check Commit on Protected Branch
+      - id: trailing-whitespace
+        name: Trim Trailing Whitespace
+      - id: end-of-file-fixer
+        name: Add Newline at EOF
+      - id: debug-statements
+        name: Check for Breakpoint function calls
+  - repo: https://github.com/asottile/add-trailing-comma
+    rev: v2.2.1
+    hooks:
+      - id: add-trailing-comma
+  - repo: https://github.com/pycqa/isort
+    rev: 5.10.1
+    hooks:
+      - id: isort
+        name: isort (Python)
+  - repo: https://github.com/psf/black
+    rev: 21.12b0
+    hooks:
+      - id: black
+        name: Black
+  - repo: https://github.com/pycqa/flake8
+    rev: 4.0.1
+    hooks:
+      - id: flake8
+        name: Flake8 Check
+  - repo: https://github.com/PyCQA/bandit
+    rev: 1.7.1
+    hooks:
+      - id: bandit
+        name: Run Common Security Checks (Bandit)
