@@ -1,0 +1,8 @@
+[run]
+source = gcmanager/*
+omit = */tests/*
+
+[report]
+fail_under = 100
+omit = */tests/*
+show_missing = true
