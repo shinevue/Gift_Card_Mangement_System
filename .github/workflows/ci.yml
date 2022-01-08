@@ -22,16 +22,8 @@ jobs:
         with:
           version: 1.1.12
           virtualenvs-create: false
-      - name: Poetry Environment Information
-        run: poetry env info
-      - name: Which python3.10
-        run: which python3.10
       - name: Install Dependencies
         run: poetry install --no-root --no-interaction
-      - name: Poetry List Dependencies
-        run: poetry show --tree
-      - name: Pip List Dependencies
-        run: pip list
       - name: Style Check (black)
         run: poetry run black . --check --verbose
       - name: Imports Sorting Check (isort)
