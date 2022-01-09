@@ -4,13 +4,13 @@ from datetime import datetime
 from typing import NewType
 
 Denomination = NewType("Denomination", int)
-ReedeemCode = NewType("RedeemCode", str)
+RedeemCode = NewType("RedeemCode", str)
 
 
 @dataclass(frozen=True)
 class GiftCard:
     id: str
-    redeem_code: ReedeemCode
+    redeem_code: RedeemCode
     date_of_issue: date
     pin: int
     timestamp: datetime
