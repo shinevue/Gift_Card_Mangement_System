@@ -34,16 +34,16 @@ jobs:
         run: poetry run flake8 .
       - name: Common Security Checks (bandit)
         run: poetry run bandit -r gcmanager tests --verbose
-      - name: Run Unit Tests
-        run: poetry run coverage run -mp unittest discover tests/unit --verbose
-      - name: Run Integration Tests
-        run: poetry run coverage run -mp unittest discover tests/integration --verbose
-      - name: Generate Coverage Report
-        run: |
-          poetry run coverage combine
-          poetry run coverage report
-      - name: Upload Coverage Report to CodeCov
-        uses: codecov/codecov-action@v2
-        with:
-          fail_ci_if_error: true
-          verbose: true
+#      - name: Run Unit Tests
+#        run: poetry run coverage run -mp unittest discover tests/unit --verbose
+#      - name: Run Integration Tests
+#        run: poetry run coverage run -mp unittest discover tests/integration --verbose
+#      - name: Generate Coverage Report
+#        run: |
+#          poetry run coverage combine
+#          poetry run coverage report
+#      - name: Upload Coverage Report to CodeCov
+#        uses: codecov/codecov-action@v2
+#        with:
+#          fail_ci_if_error: true
+#          verbose: true
