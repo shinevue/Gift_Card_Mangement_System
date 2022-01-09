@@ -1,7 +1,0 @@
-{% extends 'core/index.html' %}
-{% block title %}All Gift Cards{% endblock %}
-{% block content %}
-{% load django_tables2 %}
-<a href="{% export_url 'csv' %}" class="btn btn-primary btn-lg active mx-1 my-1">Export CSV</a>
-{% render_table table %}
-{% endblock %}

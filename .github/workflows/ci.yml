@@ -1,0 +1,49 @@
+name: CI
+on:
+  push:
+  pull_request:
+    branches:
+      - main
+jobs:
+  ci:
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-11]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - name: Checkout Code Repo
+        uses: actions/checkout@v2
+      - name: Setup Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.10.0'
+      - name: Install and configure Poetry
+        uses: snok/install-poetry@v1
+        with:
+          version: 1.1.12
+          virtualenvs-create: false
+      - name: Install Dependencies
+        run: poetry install --no-root --no-interaction
+      - name: Style Check (black)
+        run: poetry run black . --check --verbose
+      - name: Imports Sorting Check (isort)
+        run: poetry run isort . --check --diff
+      - name: Type Check (mypy)
+        run: poetry run mypy
+      - name: Lint Check (flake8)
+        run: poetry run flake8 .
+      - name: Common Security Checks (bandit)
+        run: poetry run bandit -r gcmanager tests --verbose
+#      - name: Run Unit Tests
+#        run: poetry run coverage run -mp unittest discover tests/unit --verbose
+#      - name: Run Integration Tests
+#        run: poetry run coverage run -mp unittest discover tests/integration --verbose
+#      - name: Generate Coverage Report
+#        run: |
+#          poetry run coverage combine
+#          poetry run coverage report
+#      - name: Upload Coverage Report to CodeCov
+#        uses: codecov/codecov-action@v2
+#        with:
+#          fail_ci_if_error: true
+#          verbose: true
