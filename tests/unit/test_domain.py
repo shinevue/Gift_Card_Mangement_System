@@ -2,7 +2,8 @@ import datetime
 from unittest import TestCase
 
 from gcmanager.domain import Denomination
-from gcmanager.domain import GiftCard, GiftCardAssetSummary
+from gcmanager.domain import GiftCard
+from gcmanager.domain import GiftCardAssetSummary
 from gcmanager.domain import ReedeemCode
 
 
