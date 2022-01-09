@@ -5,11 +5,12 @@ from typing import NewType
 
 Denomination = NewType("Denomination", int)
 RedeemCode = NewType("RedeemCode", str)
+GiftCardID = NewType("GiftCardID", str)
 
 
 @dataclass(frozen=True)
 class GiftCard:
-    id: str
+    id: GiftCardID
     redeem_code: RedeemCode
     date_of_issue: date
     pin: int

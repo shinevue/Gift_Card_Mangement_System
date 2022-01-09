@@ -4,13 +4,14 @@ from unittest import TestCase
 from gcmanager.domain import Denomination
 from gcmanager.domain import GiftCard
 from gcmanager.domain import GiftCardAssetSummary
+from gcmanager.domain import GiftCardID
 from gcmanager.domain import RedeemCode
 
 
 class TestGiftCard(TestCase):
     def test_returns_expected_date_of_expiry(self) -> None:
         gift_card = GiftCard(
-            id="blah-blah",
+            id=GiftCardID("blah-blah"),
             redeem_code=RedeemCode("1234-XPGJ21-T3UF"),
             date_of_issue=datetime.date(year=2022, month=1, day=3),
             pin=10293910,
