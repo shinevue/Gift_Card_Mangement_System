@@ -5,6 +5,7 @@ from gcmanager.domain import Denomination
 from gcmanager.domain import GiftCard
 from gcmanager.domain import GiftCardAssetSummary
 from gcmanager.domain import GiftCardID
+from gcmanager.domain import Money
 from gcmanager.domain import RedeemCode
 
 
@@ -34,7 +35,7 @@ class TestGiftCard(TestCase):
 class TestGiftCardAssetSummary(TestCase):
     def test_returns_expected_unused_amount(self) -> None:
         gift_card_asset_summary = GiftCardAssetSummary(
-            total=Denomination(1200),
-            used=Denomination(400),
+            total=Money(1200),
+            used=Money(400),
         )
         self.assertEqual(Denomination(800), gift_card_asset_summary.unused)

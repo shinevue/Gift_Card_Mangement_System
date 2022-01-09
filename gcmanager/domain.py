@@ -6,6 +6,7 @@ from typing import NewType
 Denomination = NewType("Denomination", int)
 RedeemCode = NewType("RedeemCode", str)
 GiftCardID = NewType("GiftCardID", str)
+Money = NewType("Money", int)
 
 
 @dataclass(frozen=True)
@@ -26,9 +27,9 @@ class GiftCard:
 
 @dataclass(frozen=True)
 class GiftCardAssetSummary:
-    total: Denomination
-    used: Denomination
+    total: Money
+    used: Money
 
     @property
-    def unused(self) -> Denomination:
-        return Denomination(self.total - self.used)
+    def unused(self) -> Money:
+        return Money(self.total - self.used)
