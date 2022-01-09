@@ -21,3 +21,13 @@ class GiftCard:
     @property
     def date_of_expiry(self) -> date:
         return self.date_of_issue.replace(year=self.date_of_issue.year + 1)
+
+
+@dataclass(frozen=True)
+class GiftCardAssetSummary:
+    total: Denomination
+    used: Denomination
+
+    @property
+    def unused(self) -> Denomination:
+        return Denomination(self.total - self.used)

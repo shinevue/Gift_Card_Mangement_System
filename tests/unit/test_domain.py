@@ -2,7 +2,7 @@ import datetime
 from unittest import TestCase
 
 from gcmanager.domain import Denomination
-from gcmanager.domain import GiftCard, GiftCardAsssetSummary
+from gcmanager.domain import GiftCard, GiftCardAssetSummary
 from gcmanager.domain import ReedeemCode
 
 
@@ -27,3 +27,12 @@ class TestGiftCard(TestCase):
         )
         expected_expiry_date = datetime.date(year=2023, month=1, day=3)
         self.assertEqual(expected_expiry_date, gift_card.date_of_expiry)
+
+
+class TestGiftCardAssetSummary(TestCase):
+    def test_returns_expected_unused_amount(self) -> None:
+        gift_card_asset_summary = GiftCardAssetSummary(
+            total=Denomination(1200),
+            used=Denomination(400),
+        )
+        self.assertEqual(Denomination(800), gift_card_asset_summary.unused)
