@@ -1,6 +1,10 @@
+from gcmanager.domain import GiftCardAssetSummary
 from gcmanager.repositories import GiftCardRepository
 
 
-class GiftCardUseCase:
-    def __init__(self, gift_card_repository: GiftCardRepository) -> None:
-        self.gift_card_repository = gift_card_repository
+class GiftCardAssetInformationUseCase:
+    def __init__(self, repository: GiftCardRepository) -> None:
+        self._repository = repository
+
+    def summarize(self) -> GiftCardAssetSummary:
+        return self._repository.get_summary()
