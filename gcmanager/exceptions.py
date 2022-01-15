@@ -1,0 +1,2 @@
+class GiftCardAlreadyExists(Exception):
+    pass
