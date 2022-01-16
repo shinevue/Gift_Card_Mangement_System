@@ -2,6 +2,7 @@ from gcmanager.domain import Denomination
 from gcmanager.domain import GiftCard
 from gcmanager.domain import GiftCardAssetSummary
 from gcmanager.exceptions import GiftCardAlreadyExists
+from gcmanager.exceptions import GiftCardNotFoundForDenomination
 from gcmanager.repositories import GiftCardRepository
 
 
@@ -29,3 +30,14 @@ class DenominationFetcherUseCase:
 
     def fetch(self) -> list[Denomination]:
         return self._repository.get_available_denominations()
+
+
+class NearExpiryGiftCardFetcherUseCase:
+    def __init__(self, repository: GiftCardRepository) -> None:
+        self._repository = repository
+
+    def fetch(self, denomination: Denomination) -> GiftCard:
+        gift_card = self._repository.get_near_expiry_gift_card(denomination)
+        if not gift_card:
+            raise GiftCardNotFoundForDenomination
+        return gift_card

@@ -6,9 +6,11 @@ from mockito import when
 
 from gcmanager.domain import Denomination
 from gcmanager.exceptions import GiftCardAlreadyExists
+from gcmanager.exceptions import GiftCardNotFoundForDenomination
 from gcmanager.usecases import AddGiftCardUseCase
 from gcmanager.usecases import DenominationFetcherUseCase
 from gcmanager.usecases import GiftCardAssetInformationUseCase
+from gcmanager.usecases import NearExpiryGiftCardFetcherUseCase
 from tests.unit.factories import GiftCardAssetSummaryFactory
 from tests.unit.factories import GiftCardFactory
 
@@ -68,3 +70,24 @@ class TestDenominationFetcherUseCase(TestCase):
     def test_returns_empty_list_of_denominations_when_called(self) -> None:
         when(self.gc_repository).get_available_denominations().thenReturn([])
         self.assertEqual([], self.use_case.fetch())
+
+
+class TestNearExpiryGiftCardFetcherUseCase(TestCase):
+    def setUp(self) -> None:
+        self.gc_repository = mock()
+        self.use_case = NearExpiryGiftCardFetcherUseCase(self.gc_repository)
+        self.gift_card = GiftCardFactory()
+
+    def test_returns_gift_card_when_fetched(self) -> None:
+        when(self.gc_repository).get_near_expiry_gift_card(
+            self.gift_card.denomination,
+        ).thenReturn(self.gift_card)
+        actual = self.use_case.fetch(self.gift_card.denomination)
+        self.assertEqual(self.gift_card, actual)
+
+    def test_raises_when_gift_card_not_found(self) -> None:
+        when(self.gc_repository).get_near_expiry_gift_card(
+            self.gift_card.denomination,
+        ).thenReturn(None)
+        with self.assertRaises(GiftCardNotFoundForDenomination):
+            self.use_case.fetch(self.gift_card.denomination)

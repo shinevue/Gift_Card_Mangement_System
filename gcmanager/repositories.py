@@ -1,5 +1,6 @@
 from abc import ABC
 from abc import abstractmethod
+from typing import Optional
 
 from gcmanager.domain import Denomination
 from gcmanager.domain import GiftCard
@@ -14,7 +15,10 @@ class GiftCardRepository(ABC):
         pass
 
     @abstractmethod
-    def get_near_expiry_gift_card(self, denomination: Denomination) -> GiftCard:
+    def get_near_expiry_gift_card(
+        self,
+        denomination: Denomination,
+    ) -> Optional[GiftCard]:
         pass
 
     @abstractmethod
