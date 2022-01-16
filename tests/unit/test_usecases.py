@@ -1,6 +1,7 @@
 from unittest import TestCase
 
 from mockito import mock
+from mockito import verify
 from mockito import when
 
 from gcmanager.exceptions import GiftCardAlreadyExists
@@ -32,8 +33,9 @@ class TestAddGiftCardUseCase(TestCase):
         when(self.gc_repository).get_by_redeem_code(
             self.gift_card.redeem_code,
         ).thenReturn(None)
-        when(self.gc_repository).create().thenReturn(None)
-        self.assertEqual(None, self.use_case.create(self.gift_card))
+        when(self.gc_repository).create(self.gift_card).thenReturn(None)
+        self.use_case.create(self.gift_card)
+        verify(self.gc_repository).create(self.gift_card)
 
     def test_raises_when_gift_card_already_exists(self) -> None:
         gift_card = GiftCardFactory()
