@@ -4,8 +4,10 @@ from mockito import mock
 from mockito import verify
 from mockito import when
 
+from gcmanager.domain import Denomination
 from gcmanager.exceptions import GiftCardAlreadyExists
 from gcmanager.usecases import AddGiftCardUseCase
+from gcmanager.usecases import DenominationFetcherUseCase
 from gcmanager.usecases import GiftCardAssetInformationUseCase
 from tests.unit.factories import GiftCardAssetSummaryFactory
 from tests.unit.factories import GiftCardFactory
@@ -44,3 +46,25 @@ class TestAddGiftCardUseCase(TestCase):
         )
         with self.assertRaises(GiftCardAlreadyExists):
             self.use_case.create(gift_card)
+
+
+class TestDenominationFetcherUseCase(TestCase):
+    def setUp(self) -> None:
+        self.gc_repository = mock()
+        self.use_case = DenominationFetcherUseCase(self.gc_repository)
+        self.denominations = [
+            Denomination(500),
+            Denomination(5000),
+            Denomination(100),
+            Denomination(200),
+        ]
+
+    def test_returns_list_of_denominations_when_called(self) -> None:
+        when(self.gc_repository).get_available_denominations().thenReturn(
+            self.denominations,
+        )
+        self.assertEqual(self.denominations, self.use_case.fetch())
+
+    def test_returns_empty_list_of_denominations_when_called(self) -> None:
+        when(self.gc_repository).get_available_denominations().thenReturn([])
+        self.assertEqual([], self.use_case.fetch())
