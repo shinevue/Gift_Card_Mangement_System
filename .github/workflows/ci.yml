@@ -34,14 +34,16 @@ jobs:
         run: poetry run flake8 .
       - name: Common Security Checks (bandit)
         run: poetry run bandit -r gcmanager tests --verbose
-      - name: Run Unit Tests
-        run: poetry run coverage run -mp unittest discover tests/unit --verbose
-      - name: Run Integration Tests
-        run: poetry run coverage run -mp unittest discover tests/integration --verbose
-      - name: Generate Coverage Report
+      - name: Testing
         run: |
+          poetry run coverage erase
+          poetry run coverage run -mp unittest discover tests/unit --verbose
+          poetry run coverage run -mp unittest discover tests/integration --verbose
           poetry run coverage combine
+      - name: Coverage
+        run: |
           poetry run coverage report
+          poetry run coverage xml
       - name: Upload Coverage Report to CodeCov
         uses: codecov/codecov-action@v2
         with:

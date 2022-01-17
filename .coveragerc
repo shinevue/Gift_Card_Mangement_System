@@ -6,3 +6,5 @@ omit = */tests/*
 fail_under = 100
 omit = */tests/*
 show_missing = true
+exclude_lines =
+    @(abc\.)?abstractmethod
