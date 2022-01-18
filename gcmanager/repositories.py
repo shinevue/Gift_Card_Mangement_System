@@ -6,6 +6,7 @@ from gcmanager.domain import Denomination
 from gcmanager.domain import GiftCard
 from gcmanager.domain import GiftCardAssetSummary
 from gcmanager.domain import GiftCardID
+from gcmanager.domain import GiftCardUpdateRequest
 from gcmanager.domain import RedeemCode
 
 
@@ -22,7 +23,10 @@ class GiftCardRepository(ABC):
         pass
 
     @abstractmethod
-    def update(self, gift_card: GiftCard) -> None:
+    def update(self, gift_card_request: GiftCardUpdateRequest) -> None:
+        pass
+
+    def mark_used(self, gift_card_id: GiftCardID) -> None:
         pass
 
     @abstractmethod
