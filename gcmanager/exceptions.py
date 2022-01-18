@@ -2,5 +2,9 @@ class GiftCardAlreadyExists(Exception):
     pass
 
 
-class GiftCardNotFoundForDenomination(Exception):
+class GiftCardNotFound(Exception):
+    pass
+
+
+class GiftCardNotFoundForDenomination(GiftCardNotFound):
     pass

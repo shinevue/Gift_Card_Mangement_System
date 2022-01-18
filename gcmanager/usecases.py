@@ -1,7 +1,9 @@
 from gcmanager.domain import Denomination
 from gcmanager.domain import GiftCard
 from gcmanager.domain import GiftCardAssetSummary
+from gcmanager.domain import GiftCardID
 from gcmanager.exceptions import GiftCardAlreadyExists
+from gcmanager.exceptions import GiftCardNotFound
 from gcmanager.exceptions import GiftCardNotFoundForDenomination
 from gcmanager.repositories import GiftCardRepository
 
@@ -41,3 +43,13 @@ class NearExpiryGiftCardFetcherUseCase:
         if not gift_card:
             raise GiftCardNotFoundForDenomination
         return gift_card
+
+
+class MarkGiftCardUsedUseCase:
+    def __init__(self, repository: GiftCardRepository) -> None:
+        self._repository = repository
+
+    def mark_used(self, gift_card_id: GiftCardID) -> None:
+        if not self._repository.get_by_id(gift_card_id):
+            raise GiftCardNotFound
+        self._repository.mark_used(gift_card_id)

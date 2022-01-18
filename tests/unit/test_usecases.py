@@ -6,10 +6,12 @@ from mockito import when
 
 from gcmanager.domain import Denomination
 from gcmanager.exceptions import GiftCardAlreadyExists
+from gcmanager.exceptions import GiftCardNotFound
 from gcmanager.exceptions import GiftCardNotFoundForDenomination
 from gcmanager.usecases import AddGiftCardUseCase
 from gcmanager.usecases import DenominationFetcherUseCase
 from gcmanager.usecases import GiftCardAssetInformationUseCase
+from gcmanager.usecases import MarkGiftCardUsedUseCase
 from gcmanager.usecases import NearExpiryGiftCardFetcherUseCase
 from tests.unit.factories import GiftCardAssetSummaryFactory
 from tests.unit.factories import GiftCardFactory
@@ -91,3 +93,22 @@ class TestNearExpiryGiftCardFetcherUseCase(TestCase):
         ).thenReturn(None)
         with self.assertRaises(GiftCardNotFoundForDenomination):
             self.use_case.fetch(self.gift_card.denomination)
+
+
+class TestMarkGiftCardUsedUseCase(TestCase):
+    def setUp(self) -> None:
+        self.gc_repository = mock()
+        self.use_case = MarkGiftCardUsedUseCase(self.gc_repository)
+
+    def test_marks_gift_card_as_used_when_called(self) -> None:
+        gift_card = GiftCardFactory()
+        when(self.gc_repository).get_by_id(gift_card.id).thenReturn(gift_card)
+        when(self.gc_repository).mark_used(gift_card.id).thenReturn(None)
+        self.use_case.mark_used(gift_card.id)
+        verify(self.gc_repository).mark_used(gift_card.id)
+
+    def test_raises_when_gift_card_is_not_found(self) -> None:
+        gift_card = GiftCardFactory()
+        when(self.gc_repository).get_by_id(gift_card.id).thenReturn(None)
+        with self.assertRaises(GiftCardNotFound):
+            self.use_case.mark_used(gift_card.id)
