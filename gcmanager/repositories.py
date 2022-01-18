@@ -26,6 +26,7 @@ class GiftCardRepository(ABC):
     def update(self, gift_card_request: GiftCardUpdateRequest) -> None:
         pass
 
+    @abstractmethod
     def mark_used(self, gift_card_id: GiftCardID) -> None:
         pass
 
