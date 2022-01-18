@@ -27,7 +27,7 @@ class GiftCardFactory(Factory):
     id = FuzzyText(length=16)
     redeem_code = FuzzyText(length=14)
     date_of_issue = FuzzyDate(start_date=date.today())
-    pin = FuzzyInteger(low=1_000_000, high=100_000_000)
+    pin = FuzzyInteger(low=1_000_000_000_000_000, high=9_999_999_999_999_999)
     timestamp = FuzzyNaiveDateTime(start_dt=datetime.now())
     is_used = False
     source = FuzzyChoice(["AMAZON", "WOOHOO", "MAGICPIN", "HDFC SMARTBUY"])
