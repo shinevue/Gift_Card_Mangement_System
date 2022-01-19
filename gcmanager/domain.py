@@ -33,3 +33,13 @@ class GiftCardAssetSummary:
     @property
     def unused(self) -> Money:
         return Money(self.total - self.used)
+
+
+@dataclass(frozen=True)
+class GiftCardUpdateRequest:
+    id: GiftCardID
+    redeem_code: RedeemCode
+    date_of_issue: date
+    pin: int
+    source: str
+    denomination: Denomination

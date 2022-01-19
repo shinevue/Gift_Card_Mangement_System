@@ -1,10 +1,13 @@
 from abc import ABC
 from abc import abstractmethod
+from typing import Optional
 
 from gcmanager.domain import Denomination
 from gcmanager.domain import GiftCard
 from gcmanager.domain import GiftCardAssetSummary
 from gcmanager.domain import GiftCardID
+from gcmanager.domain import GiftCardUpdateRequest
+from gcmanager.domain import RedeemCode
 
 
 class GiftCardRepository(ABC):
@@ -13,15 +16,26 @@ class GiftCardRepository(ABC):
         pass
 
     @abstractmethod
-    def get_near_expiry_gift_card(self, denomination: Denomination) -> GiftCard:
+    def get_near_expiry_gift_card(
+        self,
+        denomination: Denomination,
+    ) -> Optional[GiftCard]:
         pass
 
     @abstractmethod
-    def update(self, gift_card: GiftCard) -> None:
+    def update(self, gift_card_request: GiftCardUpdateRequest) -> None:
         pass
 
     @abstractmethod
-    def get(self, gift_card_id: GiftCardID) -> GiftCard:
+    def mark_used(self, gift_card_id: GiftCardID) -> None:
+        pass
+
+    @abstractmethod
+    def get_by_id(self, gift_card_id: GiftCardID) -> GiftCard:
+        pass
+
+    @abstractmethod
+    def get_by_redeem_code(self, redeem_code: RedeemCode) -> GiftCard:
         pass
 
     @abstractmethod
