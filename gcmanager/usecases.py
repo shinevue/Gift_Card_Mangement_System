@@ -2,7 +2,9 @@ from gcmanager.domain import Denomination
 from gcmanager.domain import GiftCard
 from gcmanager.domain import GiftCardAssetSummary
 from gcmanager.domain import GiftCardID
+from gcmanager.domain import GiftCardUpdateRequest
 from gcmanager.exceptions import GiftCardAlreadyExists
+from gcmanager.exceptions import GiftCardAlreadyUsed
 from gcmanager.exceptions import GiftCardNotFound
 from gcmanager.exceptions import GiftCardNotFoundForDenomination
 from gcmanager.repositories import GiftCardRepository
@@ -53,3 +55,16 @@ class MarkGiftCardUsedUseCase:
         if not self._repository.get_by_id(gift_card_id):
             raise GiftCardNotFound
         self._repository.mark_used(gift_card_id)
+
+
+class EditGiftCardUseCase:
+    def __init__(self, repository: GiftCardRepository) -> None:
+        self._repository = repository
+
+    def edit_gc(self, request: GiftCardUpdateRequest) -> None:
+        gift_card = self._repository.get_by_id(request.id)
+        if not gift_card:
+            raise GiftCardNotFound
+        if gift_card.is_used:
+            raise GiftCardAlreadyUsed
+        self._repository.update(request)

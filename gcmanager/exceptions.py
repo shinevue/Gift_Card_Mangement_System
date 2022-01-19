@@ -8,3 +8,7 @@ class GiftCardNotFound(Exception):
 
 class GiftCardNotFoundForDenomination(GiftCardNotFound):
     pass
+
+
+class GiftCardAlreadyUsed(Exception):
+    pass

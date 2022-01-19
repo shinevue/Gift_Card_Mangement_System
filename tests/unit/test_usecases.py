@@ -6,15 +6,18 @@ from mockito import when
 
 from gcmanager.domain import Denomination
 from gcmanager.exceptions import GiftCardAlreadyExists
+from gcmanager.exceptions import GiftCardAlreadyUsed
 from gcmanager.exceptions import GiftCardNotFound
 from gcmanager.exceptions import GiftCardNotFoundForDenomination
 from gcmanager.usecases import AddGiftCardUseCase
 from gcmanager.usecases import DenominationFetcherUseCase
+from gcmanager.usecases import EditGiftCardUseCase
 from gcmanager.usecases import GiftCardAssetInformationUseCase
 from gcmanager.usecases import MarkGiftCardUsedUseCase
 from gcmanager.usecases import NearExpiryGiftCardFetcherUseCase
 from tests.unit.factories import GiftCardAssetSummaryFactory
 from tests.unit.factories import GiftCardFactory
+from tests.unit.factories import GiftCardUpdateRequestFactory
 
 
 class TestGiftCardAssetInformationUseCase(TestCase):
@@ -112,3 +115,30 @@ class TestMarkGiftCardUsedUseCase(TestCase):
         when(self.gc_repository).get_by_id(gift_card.id).thenReturn(None)
         with self.assertRaises(GiftCardNotFound):
             self.use_case.mark_used(gift_card.id)
+
+
+class TestEditGiftCardUseCase(TestCase):
+    def setUp(self) -> None:
+        self.gc_repository = mock()
+        self.use_case = EditGiftCardUseCase(self.gc_repository)
+
+    def test_returns_none_when_gift_card_updated(self) -> None:
+        gift_card = GiftCardFactory()
+        gift_card_update_request = GiftCardUpdateRequestFactory(id=gift_card.id)
+        when(self.gc_repository).get_by_id(gift_card.id).thenReturn(gift_card)
+        when(self.gc_repository).update(gift_card_update_request).thenReturn(None)
+        self.use_case.edit_gc(gift_card_update_request)
+
+    def test_raises_when_gift_card_not_found(self) -> None:
+        gift_card = GiftCardFactory()
+        gift_card_update_request = GiftCardUpdateRequestFactory(id=gift_card.id)
+        when(self.gc_repository).get_by_id(gift_card.id).thenReturn(None)
+        with self.assertRaises(GiftCardNotFound):
+            self.use_case.edit_gc(gift_card_update_request)
+
+    def test_raises_when_gift_card_is_used(self) -> None:
+        gift_card = GiftCardFactory(is_used=True)
+        gift_card_update_request = GiftCardUpdateRequestFactory(id=gift_card.id)
+        when(self.gc_repository).get_by_id(gift_card.id).thenReturn(gift_card)
+        with self.assertRaises(GiftCardAlreadyUsed):
+            self.use_case.edit_gc(gift_card_update_request)
