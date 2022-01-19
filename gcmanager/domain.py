@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+from dataclasses import field
 from datetime import date
 from datetime import datetime
 from typing import NewType
@@ -15,10 +16,10 @@ class GiftCard:
     redeem_code: RedeemCode
     date_of_issue: date
     pin: int
-    timestamp: datetime
     is_used: bool
     source: str
     denomination: Denomination
+    timestamp: datetime = field(default_factory=datetime.now)
 
     @property
     def date_of_expiry(self) -> date:
