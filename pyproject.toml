@@ -9,6 +9,7 @@ license = "MIT"
 python = "3.10.0"
 kink = "^0.6.2"
 falcon = "^3.0.1"
+marshmallow = "^3.14.1"
 
 [tool.poetry.dev-dependencies]
 coverage = "^6.2"
