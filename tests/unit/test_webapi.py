@@ -9,6 +9,8 @@ from mockito import when
 from gcmanager.domain import GiftCardAssetSummary
 from gcmanager.domain import Money
 from gcmanager.webapi import GiftCardAssetInformationResource
+from gcmanager.webapi import GiftCardResource
+from tests.unit.factories import GiftCardFactory
 
 
 class TestGiftCardAssetInformationResource(TestCase):
@@ -20,9 +22,9 @@ class TestGiftCardAssetInformationResource(TestCase):
         when(self.use_case).summarize().thenReturn(
             GiftCardAssetSummary(total=Money(1000), used=Money(800)),
         )
-        self.request = testing.create_req()
-        self.response = falcon.Response()
-        self.resource.on_get(self.request, self.response)
+        request = testing.create_req()
+        response = falcon.Response()
+        self.resource.on_get(request, response)
         expected_body = {
             "status": "ok",
             "data": {
@@ -31,5 +33,42 @@ class TestGiftCardAssetInformationResource(TestCase):
                 "unused": 200,
             },
         }
-        self.assertEqual(falcon.HTTP_200, self.response.status)
-        self.assertEqual(expected_body, json.loads(self.response.text))
+        self.assertEqual(falcon.HTTP_200, response.status)
+        self.assertEqual(expected_body, json.loads(response.text))
+
+
+class TestGiftCardResource(TestCase):
+    def setUp(self) -> None:
+        self.maxDiff = None
+        self.create_use_case = mock()
+        self.get_unused_gc_use_case = mock()
+        self.resource = GiftCardResource(
+            self.create_use_case,
+            self.get_unused_gc_use_case,
+        )
+        self.gift_cards = GiftCardFactory.build_batch(5, is_used=False)
+
+    def test_returns_expected_response_when_get(self) -> None:
+        request = testing.create_req()
+        response = falcon.Response()
+        when(self.get_unused_gc_use_case).fetch().thenReturn(self.gift_cards)
+        self.resource.on_get(request, response)
+        expected_body = {
+            "status": "ok",
+            "data": [
+                {
+                    "id": gift_card.id,
+                    "redeem_code": gift_card.redeem_code,
+                    "date_of_issue": gift_card.date_of_issue.isoformat(),
+                    "date_of_expiry": gift_card.date_of_expiry.isoformat(),
+                    "pin": gift_card.pin,
+                    "timestamp": gift_card.timestamp.isoformat(),
+                    "is_used": gift_card.is_used,
+                    "source": gift_card.source,
+                    "denomination": gift_card.denomination,
+                }
+                for gift_card in self.gift_cards
+            ],
+        }
+        self.assertEqual(falcon.HTTP_200, response.status)
+        self.assertEqual(expected_body, json.loads(response.text))

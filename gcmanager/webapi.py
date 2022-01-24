@@ -2,6 +2,9 @@ import falcon
 
 from gcmanager.domain import SuccessfulResponse
 from gcmanager.serializers import GiftCardAssetSummarySerializer
+from gcmanager.serializers import GiftCardSerializer
+from gcmanager.usecases import AddGiftCardUseCase
+from gcmanager.usecases import FetchUnusedGiftCardsUseCase
 from gcmanager.usecases import GiftCardAssetInformationUseCase
 
 
@@ -13,5 +16,22 @@ class GiftCardAssetInformationResource:
     def on_get(self, request: falcon.Request, response: falcon.Response) -> None:
         assets = self._use_case.summarize()
         serialized_data = self._serializer.dump(assets)
+        response.text = SuccessfulResponse(data=serialized_data).serialize()
+        response.status = falcon.HTTP_200
+
+
+class GiftCardResource:
+    def __init__(
+        self,
+        create_use_case: AddGiftCardUseCase,
+        get_unused_use_case: FetchUnusedGiftCardsUseCase,
+    ) -> None:
+        self._create_use_case = create_use_case
+        self._get_unused_use_case = get_unused_use_case
+        self._serializer = GiftCardSerializer()
+
+    def on_get(self, request: falcon.Request, response: falcon.Response) -> None:
+        gift_cards = self._get_unused_use_case.fetch()
+        serialized_data = self._serializer.dump(gift_cards, many=True)
         response.text = SuccessfulResponse(data=serialized_data).serialize()
         response.status = falcon.HTTP_200
