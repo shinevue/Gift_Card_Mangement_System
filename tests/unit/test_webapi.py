@@ -72,3 +72,15 @@ class TestGiftCardResource(TestCase):
         }
         self.assertEqual(falcon.HTTP_200, response.status)
         self.assertEqual(expected_body, json.loads(response.text))
+
+    def test_returns_empty_list_when_get(self) -> None:
+        request = testing.create_req()
+        response = falcon.Response()
+        when(self.get_unused_gc_use_case).fetch().thenReturn([])
+        self.resource.on_get(request, response)
+        expected_body = {
+            "status": "ok",
+            "data": [],
+        }
+        self.assertEqual(falcon.HTTP_200, response.status)
+        self.assertEqual(expected_body, json.loads(response.text))
