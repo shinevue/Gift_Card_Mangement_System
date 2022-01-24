@@ -68,3 +68,11 @@ class EditGiftCardUseCase:
         if gift_card.is_used:
             raise GiftCardAlreadyUsed
         self._repository.update(request)
+
+
+class FetchUnusedGiftCardsUseCase:
+    def __init__(self, repository: GiftCardRepository) -> None:
+        self._repository = repository
+
+    def fetch(self) -> list[GiftCard]:
+        return self._repository.get_unused()

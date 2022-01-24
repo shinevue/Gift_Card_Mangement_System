@@ -12,6 +12,7 @@ from gcmanager.exceptions import GiftCardNotFoundForDenomination
 from gcmanager.usecases import AddGiftCardUseCase
 from gcmanager.usecases import DenominationFetcherUseCase
 from gcmanager.usecases import EditGiftCardUseCase
+from gcmanager.usecases import FetchUnusedGiftCardsUseCase
 from gcmanager.usecases import GiftCardAssetInformationUseCase
 from gcmanager.usecases import MarkGiftCardUsedUseCase
 from gcmanager.usecases import NearExpiryGiftCardFetcherUseCase
@@ -142,3 +143,20 @@ class TestEditGiftCardUseCase(TestCase):
         when(self.gc_repository).get_by_id(gift_card.id).thenReturn(gift_card)
         with self.assertRaises(GiftCardAlreadyUsed):
             self.use_case.edit_gc(gift_card_update_request)
+
+
+class TestFetchUnusedGiftCardsUseCase(TestCase):
+    def setUp(self) -> None:
+        self.gc_repository = mock()
+        self.use_case = FetchUnusedGiftCardsUseCase(self.gc_repository)
+        self.gift_cards = GiftCardFactory.build_batch(size=4, is_used=False)
+
+    def test_returns_unused_gift_cards_when_called(self) -> None:
+        when(self.gc_repository).get_unused().thenReturn(self.gift_cards)
+        actual = self.use_case.fetch()
+        self.assertEqual(self.gift_cards, actual)
+
+    def test_returns_empty_list_when_called(self) -> None:
+        when(self.gc_repository).get_unused().thenReturn([])
+        actual = self.use_case.fetch()
+        self.assertEqual([], actual)
