@@ -31,11 +31,11 @@ class GiftCardRepository(ABC):
         pass
 
     @abstractmethod
-    def get_by_id(self, gift_card_id: GiftCardID) -> GiftCard:
+    def get_by_id(self, gift_card_id: GiftCardID) -> Optional[GiftCard]:
         pass
 
     @abstractmethod
-    def get_by_redeem_code(self, redeem_code: RedeemCode) -> GiftCard:
+    def get_by_redeem_code(self, redeem_code: RedeemCode) -> Optional[GiftCard]:
         pass
 
     @abstractmethod
