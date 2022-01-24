@@ -1,8 +1,11 @@
+import json
 from dataclasses import dataclass
 from dataclasses import field
 from datetime import date
 from datetime import datetime
 from typing import NewType
+
+from gcmanager.enums import ResponseStatus
 
 Denomination = NewType("Denomination", int)
 RedeemCode = NewType("RedeemCode", str)
@@ -44,3 +47,17 @@ class GiftCardUpdateRequest:
     pin: int
     source: str
     denomination: Denomination
+
+
+@dataclass(frozen=True)
+class SuccessfulResponse:
+    data: list | dict
+    status: ResponseStatus = field(init=False, default=ResponseStatus.OK)
+
+    def serialize(self) -> str:
+        return json.dumps(
+            {
+                "status": self.status.value,
+                "data": self.data,
+            },
+        )
