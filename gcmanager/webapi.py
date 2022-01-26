@@ -1,3 +1,5 @@
+import json
+
 import falcon
 
 from gcmanager.domain import SuccessfulResponse
@@ -35,3 +37,9 @@ class GiftCardResource:
         serialized_data = self._serializer.dump(gift_cards, many=True)
         response.text = SuccessfulResponse(data=serialized_data).serialize()
         response.status = falcon.HTTP_200
+
+    def on_post(self, request: falcon.Request, response: falcon.Response) -> None:
+        payload = json.loads(request.bounded_stream.read())
+        gift_card = self._serializer.load(payload)
+        self._create_use_case.create(gift_card)
+        response.status = falcon.HTTP_201

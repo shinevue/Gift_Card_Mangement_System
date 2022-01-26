@@ -11,6 +11,7 @@ from gcmanager.domain import Money
 from gcmanager.webapi import GiftCardAssetInformationResource
 from gcmanager.webapi import GiftCardResource
 from tests.unit.factories import GiftCardFactory
+from tests.unit.factories import GiftCardPayloadFactory
 
 
 class TestGiftCardAssetInformationResource(TestCase):
@@ -57,7 +58,7 @@ class TestGiftCardResource(TestCase):
             "status": "ok",
             "data": [
                 {
-                    "id": gift_card.id,
+                    "id": str(gift_card.id),
                     "redeem_code": gift_card.redeem_code,
                     "date_of_issue": gift_card.date_of_issue.isoformat(),
                     "date_of_expiry": gift_card.date_of_expiry.isoformat(),
@@ -84,3 +85,18 @@ class TestGiftCardResource(TestCase):
         }
         self.assertEqual(falcon.HTTP_200, response.status)
         self.assertEqual(expected_body, json.loads(response.text))
+
+    def test_returns_201_when_post(self) -> None:
+        payload = GiftCardPayloadFactory()
+        request = testing.create_req(body=json.dumps(payload, default=str))
+        response = falcon.Response()
+        gift_card = GiftCardFactory(
+            redeem_code=payload["redeem_code"],
+            date_of_issue=payload["date_of_issue"],
+            pin=payload["pin"],
+            source=payload["source"],
+            denomination=payload["denomination"],
+        )
+        when(self.create_use_case).create(gift_card).thenReturn(None)
+        self.resource.on_post(request, response)
+        self.assertEqual(falcon.HTTP_201, response.status)

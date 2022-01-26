@@ -1,4 +1,5 @@
 import json
+import uuid
 from dataclasses import dataclass
 from dataclasses import field
 from datetime import date
@@ -9,19 +10,19 @@ from gcmanager.enums import ResponseStatus
 
 Denomination = NewType("Denomination", int)
 RedeemCode = NewType("RedeemCode", str)
-GiftCardID = NewType("GiftCardID", str)
+GiftCardID = uuid.UUID
 Money = NewType("Money", int)
 
 
 @dataclass(frozen=True)
 class GiftCard:
-    id: GiftCardID
     redeem_code: RedeemCode
     date_of_issue: date
     pin: int
-    is_used: bool
     source: str
     denomination: Denomination
+    is_used: bool = field(default=False)
+    id: GiftCardID = field(default_factory=uuid.uuid4)
     timestamp: datetime = field(default_factory=datetime.now)
 
     @property
