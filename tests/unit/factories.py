@@ -14,6 +14,7 @@ from factory.fuzzy import FuzzyText
 
 from gcmanager.domain import GiftCard
 from gcmanager.domain import GiftCardAssetSummary
+from gcmanager.domain import GiftCardCreateRequest
 from gcmanager.domain import GiftCardUpdateRequest
 
 
@@ -52,6 +53,16 @@ class GiftCardUpdateRequestFactory(Factory):
 
 
 class GiftCardPayloadFactory(DictFactory):
+    redeem_code = FuzzyText(length=14, chars=string.ascii_uppercase)
+    date_of_issue = FuzzyDate(start_date=date.today())
+    pin = FuzzyInteger(low=1_000_000_000_000_000, high=9_999_999_999_999_999)
+    source = FuzzyChoice(["AMAZON", "WOOHOO", "MAGICPIN", "HDFC SMARTBUY"])
+    denomination = FuzzyInteger(low=1000, high=10000, step=1000)
+
+
+class GiftCardCreateRequestFactory(Factory):
+    class Meta:
+        model = GiftCardCreateRequest
 
     redeem_code = FuzzyText(length=14, chars=string.ascii_uppercase)
     date_of_issue = FuzzyDate(start_date=date.today())

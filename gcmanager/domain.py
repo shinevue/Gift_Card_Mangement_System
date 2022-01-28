@@ -51,6 +51,15 @@ class GiftCardUpdateRequest:
 
 
 @dataclass(frozen=True)
+class GiftCardCreateRequest:
+    redeem_code: RedeemCode
+    date_of_issue: date
+    pin: int
+    source: str
+    denomination: Denomination
+
+
+@dataclass(frozen=True)
 class SuccessfulResponse:
     data: list | dict
     status: ResponseStatus = field(init=False, default=ResponseStatus.OK)

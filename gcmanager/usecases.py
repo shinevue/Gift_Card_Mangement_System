@@ -1,6 +1,7 @@
 from gcmanager.domain import Denomination
 from gcmanager.domain import GiftCard
 from gcmanager.domain import GiftCardAssetSummary
+from gcmanager.domain import GiftCardCreateRequest
 from gcmanager.domain import GiftCardID
 from gcmanager.domain import GiftCardUpdateRequest
 from gcmanager.exceptions import GiftCardAlreadyExists
@@ -22,9 +23,16 @@ class AddGiftCardUseCase:
     def __init__(self, repository: GiftCardRepository) -> None:
         self._repository = repository
 
-    def create(self, gift_card: GiftCard) -> None:
-        if self._repository.get_by_redeem_code(gift_card.redeem_code):
+    def create(self, gift_card_request: GiftCardCreateRequest) -> None:
+        if self._repository.get_by_redeem_code(gift_card_request.redeem_code):
             raise GiftCardAlreadyExists
+        gift_card = GiftCard(
+            redeem_code=gift_card_request.redeem_code,
+            pin=gift_card_request.pin,
+            date_of_issue=gift_card_request.date_of_issue,
+            source=gift_card_request.source,
+            denomination=gift_card_request.denomination,
+        )
         self._repository.create(gift_card)
 
 
