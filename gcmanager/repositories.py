@@ -1,3 +1,5 @@
+import datetime
+import uuid
 from abc import ABC
 from abc import abstractmethod
 from typing import Optional
@@ -11,6 +13,14 @@ from gcmanager.domain import RedeemCode
 
 
 class GiftCardRepository(ABC):
+    @abstractmethod
+    def next_id(self) -> uuid.UUID:
+        pass
+
+    @abstractmethod
+    def timestamp(self) -> datetime.datetime:
+        pass
+
     @abstractmethod
     def get_available_denominations(self) -> list[Denomination]:
         pass

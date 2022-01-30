@@ -52,7 +52,10 @@ class TestAddGiftCardUseCase(TestCase):
             self.gift_card_create_request.redeem_code,
         ).thenReturn(None)
         when(self.gc_repository).create(self.gift_card).thenReturn(None)
-        self.assertIsNone(self.use_case.create(self.gift_card_create_request))
+        when(self.gc_repository).next_id().thenReturn(self.gift_card.id)
+        when(self.gc_repository).timestamp().thenReturn(self.gift_card.timestamp)
+        self.use_case.create(self.gift_card_create_request)
+        verify(self.gc_repository).create(self.gift_card)
 
     def test_raises_when_gift_card_already_exists(self) -> None:
         when(self.gc_repository).get_by_redeem_code(

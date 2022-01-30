@@ -16,14 +16,14 @@ Money = NewType("Money", int)
 
 @dataclass(frozen=True)
 class GiftCard:
+    id: GiftCardID
     redeem_code: RedeemCode
     date_of_issue: date
     pin: int
     source: str
     denomination: Denomination
+    timestamp: datetime
     is_used: bool = field(default=False)
-    id: GiftCardID = field(default_factory=uuid.uuid4)
-    timestamp: datetime = field(default_factory=datetime.now)
 
     @property
     def date_of_expiry(self) -> date:

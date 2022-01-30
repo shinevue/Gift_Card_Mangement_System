@@ -27,11 +27,13 @@ class AddGiftCardUseCase:
         if self._repository.get_by_redeem_code(gift_card_request.redeem_code):
             raise GiftCardAlreadyExists
         gift_card = GiftCard(
+            id=self._repository.next_id(),
             redeem_code=gift_card_request.redeem_code,
             pin=gift_card_request.pin,
             date_of_issue=gift_card_request.date_of_issue,
             source=gift_card_request.source,
             denomination=gift_card_request.denomination,
+            timestamp=self._repository.timestamp(),
         )
         self._repository.create(gift_card)
 

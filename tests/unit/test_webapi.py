@@ -10,6 +10,7 @@ from gcmanager.domain import GiftCardAssetSummary
 from gcmanager.domain import Money
 from gcmanager.webapi import GiftCardAssetInformationResource
 from gcmanager.webapi import GiftCardResource
+from tests.unit.factories import GiftCardCreateRequestFactory
 from tests.unit.factories import GiftCardFactory
 from tests.unit.factories import GiftCardPayloadFactory
 
@@ -90,13 +91,13 @@ class TestGiftCardResource(TestCase):
         payload = GiftCardPayloadFactory()
         request = testing.create_req(body=json.dumps(payload, default=str))
         response = falcon.Response()
-        gift_card = GiftCardFactory(
+        gift_card_create_request = GiftCardCreateRequestFactory(
             redeem_code=payload["redeem_code"],
             date_of_issue=payload["date_of_issue"],
             pin=payload["pin"],
             source=payload["source"],
             denomination=payload["denomination"],
         )
-        when(self.create_use_case).create(gift_card).thenReturn(None)
+        when(self.create_use_case).create(gift_card_create_request).thenReturn(None)
         self.resource.on_post(request, response)
         self.assertEqual(falcon.HTTP_201, response.status)

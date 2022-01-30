@@ -5,6 +5,7 @@ from marshmallow import fields
 from marshmallow import post_load
 
 from gcmanager.domain import GiftCard
+from gcmanager.domain import GiftCardCreateRequest
 
 
 class GiftCardAssetSummarySerializer(Schema):
@@ -27,3 +28,20 @@ class GiftCardSerializer(Schema):
     @post_load
     def make_gc(self, data: dict, many: bool, **kwargs: Any) -> GiftCard:
         return GiftCard(**data)
+
+
+class GiftCardCreateRequestSerializer(Schema):
+    redeem_code = fields.Str()
+    date_of_issue = fields.Date()
+    pin = fields.Int()
+    source = fields.Str()
+    denomination = fields.Int()
+
+    @post_load
+    def make_request(
+        self,
+        data: dict,
+        many: bool,
+        **kwargs: Any,
+    ) -> GiftCardCreateRequest:
+        return GiftCardCreateRequest(**data)
