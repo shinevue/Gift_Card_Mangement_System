@@ -4,7 +4,6 @@ from marshmallow import Schema
 from marshmallow import fields
 from marshmallow import post_load
 
-from gcmanager.domain import GiftCard
 from gcmanager.domain import GiftCardCreateRequest
 
 
@@ -24,10 +23,6 @@ class GiftCardSerializer(Schema):
     denomination = fields.Int()
     timestamp = fields.NaiveDateTime(dump_only=True)
     date_of_expiry = fields.Date(dump_only=True)
-
-    @post_load
-    def make_gc(self, data: dict, many: bool, **kwargs: Any) -> GiftCard:
-        return GiftCard(**data)
 
 
 class GiftCardCreateRequestSerializer(Schema):
