@@ -1,8 +1,10 @@
 import json
 
 import falcon
+from falcon import errors
 
 from gcmanager.domain import SuccessfulResponse
+from gcmanager.exceptions import GiftCardAlreadyExists
 from gcmanager.serializers import GiftCardAssetSummarySerializer
 from gcmanager.serializers import GiftCardCreateRequestSerializer
 from gcmanager.serializers import GiftCardSerializer
@@ -43,5 +45,8 @@ class GiftCardResource:
     def on_post(self, request: falcon.Request, response: falcon.Response) -> None:
         payload = json.loads(request.bounded_stream.read())
         gift_card_create_request = self._load_serializer.load(payload)
-        self._create_use_case.create(gift_card_create_request)
+        try:
+            self._create_use_case.create(gift_card_create_request)
+        except GiftCardAlreadyExists:
+            raise errors.HTTPBadRequest
         response.status = falcon.HTTP_201
