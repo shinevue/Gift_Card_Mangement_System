@@ -4,8 +4,10 @@ import falcon
 from falcon import errors
 from marshmallow import ValidationError
 
+from gcmanager.domain import Denomination
 from gcmanager.domain import SuccessfulResponse
 from gcmanager.exceptions import GiftCardAlreadyExists
+from gcmanager.exceptions import GiftCardNotFoundForDenomination
 from gcmanager.serializers import GiftCardAssetSummarySerializer
 from gcmanager.serializers import GiftCardCreateRequestSerializer
 from gcmanager.serializers import GiftCardSerializer
@@ -13,6 +15,7 @@ from gcmanager.usecases import AddGiftCardUseCase
 from gcmanager.usecases import DenominationFetcherUseCase
 from gcmanager.usecases import FetchUnusedGiftCardsUseCase
 from gcmanager.usecases import GiftCardAssetInformationUseCase
+from gcmanager.usecases import NearExpiryGiftCardFetcherUseCase
 
 
 class GiftCardAssetInformationResource:
@@ -68,3 +71,23 @@ class DenominationResource:
         denominations = self._use_case.fetch()
         response.status = falcon.HTTP_200
         response.text = SuccessfulResponse(denominations).serialize()
+
+
+class NearExpiryGiftCardResource:
+    def __init__(self, use_case: NearExpiryGiftCardFetcherUseCase) -> None:
+        self._use_case = use_case
+        self._serializer = GiftCardSerializer()
+
+    def on_get(
+        self,
+        request: falcon.Request,
+        response: falcon.Response,
+        denomination: int,
+    ) -> None:
+        try:
+            gift_card = self._use_case.fetch(Denomination(denomination))
+        except GiftCardNotFoundForDenomination:
+            raise errors.HTTPNotFound
+        serialized_data = self._serializer.dump(gift_card)
+        response.status = falcon.HTTP_200
+        response.text = SuccessfulResponse(serialized_data).serialize()

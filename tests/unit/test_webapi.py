@@ -11,9 +11,11 @@ from gcmanager.domain import Denomination
 from gcmanager.domain import GiftCardAssetSummary
 from gcmanager.domain import Money
 from gcmanager.exceptions import GiftCardAlreadyExists
+from gcmanager.exceptions import GiftCardNotFoundForDenomination
 from gcmanager.webapi import DenominationResource
 from gcmanager.webapi import GiftCardAssetInformationResource
 from gcmanager.webapi import GiftCardResource
+from gcmanager.webapi import NearExpiryGiftCardResource
 from tests.unit.factories import GiftCardCreateRequestFactory
 from tests.unit.factories import GiftCardFactory
 from tests.unit.factories import GiftCardPayloadFactory
@@ -171,3 +173,43 @@ class TestDenominationResource(TestCase):
         self.resource.on_get(request, response)
         self.assertEqual(falcon.HTTP_200, response.status)
         self.assertEqual(expected_body, json.loads(response.text))
+
+
+class TestNearExpiryGiftCardResource(TestCase):
+    def setUp(self) -> None:
+        self.use_case = mock()
+        self.resource = NearExpiryGiftCardResource(self.use_case)
+        self.gift_card = GiftCardFactory()
+
+    def test_returns_expected_response(self) -> None:
+        request = falcon.testing.create_req()
+        when(self.use_case).fetch(self.gift_card.denomination).thenReturn(
+            self.gift_card,
+        )
+        response = falcon.Response()
+        expected_body = {
+            "status": "ok",
+            "data": {
+                "id": str(self.gift_card.id),
+                "redeem_code": self.gift_card.redeem_code,
+                "date_of_issue": self.gift_card.date_of_issue.isoformat(),
+                "pin": self.gift_card.pin,
+                "source": self.gift_card.source,
+                "denomination": self.gift_card.denomination,
+                "timestamp": self.gift_card.timestamp.isoformat(),
+                "is_used": self.gift_card.is_used,
+                "date_of_expiry": self.gift_card.date_of_expiry.isoformat(),
+            },
+        }
+        self.resource.on_get(request, response, self.gift_card.denomination)
+        self.assertEqual(falcon.HTTP_200, response.status)
+        self.assertEqual(expected_body, json.loads(response.text))
+
+    def test_raises_404_when_gift_card_not_found_for_denomination(self) -> None:
+        request = falcon.testing.create_req()
+        when(self.use_case).fetch(self.gift_card.denomination).thenRaise(
+            GiftCardNotFoundForDenomination,
+        )
+        response = falcon.Response()
+        with self.assertRaises(errors.HTTPNotFound):
+            self.resource.on_get(request, response, self.gift_card.denomination)
