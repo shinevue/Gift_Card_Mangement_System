@@ -2,6 +2,7 @@ import json
 
 import falcon
 from falcon import errors
+from marshmallow import ValidationError
 
 from gcmanager.domain import SuccessfulResponse
 from gcmanager.exceptions import GiftCardAlreadyExists
@@ -44,7 +45,13 @@ class GiftCardResource:
 
     def on_post(self, request: falcon.Request, response: falcon.Response) -> None:
         payload = json.loads(request.bounded_stream.read())
-        gift_card_create_request = self._load_serializer.load(payload)
+        try:
+            gift_card_create_request = self._load_serializer.load(payload)
+        except ValidationError as validation_error:
+            raise errors.HTTPBadRequest(
+                title="Validation Error",
+                description=validation_error.messages,
+            )
         try:
             self._create_use_case.create(gift_card_create_request)
         except GiftCardAlreadyExists:

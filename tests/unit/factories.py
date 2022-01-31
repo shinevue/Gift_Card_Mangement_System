@@ -3,6 +3,7 @@ import uuid
 from datetime import date
 from datetime import datetime
 
+import factory
 from factory import DictFactory
 from factory import Factory
 from factory import LazyFunction
@@ -31,7 +32,7 @@ class GiftCardFactory(Factory):
         model = GiftCard
 
     id = LazyFunction(uuid.uuid4)
-    redeem_code = FuzzyText(length=14, chars=string.ascii_uppercase)
+    redeem_code = FuzzyText(length=14, chars=string.ascii_uppercase + string.digits)
     date_of_issue = FuzzyDate(start_date=date.today())
     pin = FuzzyInteger(low=1_000_000_000_000_000, high=9_999_999_999_999_999)
     timestamp = FuzzyNaiveDateTime(start_dt=datetime.now())
@@ -45,7 +46,7 @@ class GiftCardUpdateRequestFactory(Factory):
         model = GiftCardUpdateRequest
 
     id = LazyFunction(uuid.uuid4)
-    redeem_code = FuzzyText(length=14)
+    redeem_code = FuzzyText(length=14, chars=string.ascii_uppercase + string.digits)
     date_of_issue = FuzzyDate(start_date=date.today())
     pin = FuzzyInteger(low=1_000_000_000_000_000, high=9_999_999_999_999_999)
     source = FuzzyChoice(["AMAZON", "WOOHOO", "MAGICPIN", "HDFC SMARTBUY"])
@@ -53,7 +54,31 @@ class GiftCardUpdateRequestFactory(Factory):
 
 
 class GiftCardPayloadFactory(DictFactory):
-    redeem_code = FuzzyText(length=14, chars=string.ascii_uppercase)
+    class Params:
+        redeem_code_length_greater = factory.Trait(
+            redeem_code=FuzzyText(
+                length=15,
+                chars=string.ascii_uppercase + string.digits,
+            ),
+        )
+        redeem_code_length_lesser = factory.Trait(
+            redeem_code=FuzzyText(
+                length=13,
+                chars=string.ascii_uppercase + string.digits,
+            ),
+        )
+        redeem_code_not_alphanumeric = factory.Trait(
+            redeem_code=FuzzyText(length=14, chars=string.punctuation),
+        )
+        date_of_issue_one_year_past = factory.Trait(
+            date_of_issue=LazyFunction(
+                lambda: date.today().replace(year=date.today().year - 1),
+            ),
+        )
+        pin_length_greater = factory.Trait(pin=10_000_000_000_000_000)
+        pin_length_lesser = factory.Trait(pin=999_999_999_999_999)
+
+    redeem_code = FuzzyText(length=14, chars=string.ascii_uppercase + string.digits)
     date_of_issue = FuzzyDate(start_date=date.today())
     pin = FuzzyInteger(low=1_000_000_000_000_000, high=9_999_999_999_999_999)
     source = FuzzyChoice(["AMAZON", "WOOHOO", "MAGICPIN", "HDFC SMARTBUY"])
@@ -64,7 +89,7 @@ class GiftCardCreateRequestFactory(Factory):
     class Meta:
         model = GiftCardCreateRequest
 
-    redeem_code = FuzzyText(length=14, chars=string.ascii_uppercase)
+    redeem_code = FuzzyText(length=14, chars=string.ascii_uppercase + string.digits)
     date_of_issue = FuzzyDate(start_date=date.today())
     pin = FuzzyInteger(low=1_000_000_000_000_000, high=9_999_999_999_999_999)
     source = FuzzyChoice(["AMAZON", "WOOHOO", "MAGICPIN", "HDFC SMARTBUY"])

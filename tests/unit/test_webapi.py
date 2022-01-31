@@ -120,3 +120,21 @@ class TestGiftCardResource(TestCase):
         )
         with self.assertRaises(errors.HTTPBadRequest):
             self.resource.on_post(request, response)
+
+    def test_raises_400_when_payload_invalid(self) -> None:
+        payloads = [
+            GiftCardPayloadFactory(redeem_code_length_greater=True),
+            GiftCardPayloadFactory(redeem_code_length_lesser=True),
+            GiftCardPayloadFactory(redeem_code_not_alphanumeric=True),
+            GiftCardPayloadFactory(date_of_issue_one_year_past=True),
+            GiftCardPayloadFactory(pin_length_greater=True),
+            GiftCardPayloadFactory(pin_length_lesser=True),
+            GiftCardPayloadFactory(denomination=9),
+            GiftCardPayloadFactory(denomination=10001),
+        ]
+        for payload in payloads:
+            request = testing.create_req(body=json.dumps(payload, default=str))
+            response = falcon.Response()
+            with self.subTest(payload=payload):
+                with self.assertRaises(errors.HTTPBadRequest):
+                    self.resource.on_post(request, response)
