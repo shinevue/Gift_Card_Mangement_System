@@ -7,9 +7,11 @@ from falcon import testing
 from mockito import mock
 from mockito import when
 
+from gcmanager.domain import Denomination
 from gcmanager.domain import GiftCardAssetSummary
 from gcmanager.domain import Money
 from gcmanager.exceptions import GiftCardAlreadyExists
+from gcmanager.webapi import DenominationResource
 from gcmanager.webapi import GiftCardAssetInformationResource
 from gcmanager.webapi import GiftCardResource
 from tests.unit.factories import GiftCardCreateRequestFactory
@@ -138,3 +140,34 @@ class TestGiftCardResource(TestCase):
             with self.subTest(payload=payload):
                 with self.assertRaises(errors.HTTPBadRequest):
                     self.resource.on_post(request, response)
+
+
+class TestDenominationResource(TestCase):
+    def setUp(self) -> None:
+        self.use_case = mock()
+        self.resource = DenominationResource(self.use_case)
+        self.denominations = [
+            Denomination(100),
+            Denomination(200),
+            Denomination(500),
+            Denomination(1000),
+            Denomination(5000),
+        ]
+
+    def test_returns_expected_denominations(self) -> None:
+        request = falcon.testing.create_req()
+        response = falcon.Response()
+        when(self.use_case).fetch().thenReturn(self.denominations)
+        expected_body = {"status": "ok", "data": [100, 200, 500, 1000, 5000]}
+        self.resource.on_get(request, response)
+        self.assertEqual(falcon.HTTP_200, response.status)
+        self.assertEqual(expected_body, json.loads(response.text))
+
+    def test_returns_expected_empty_list(self) -> None:
+        request = falcon.testing.create_req()
+        response = falcon.Response()
+        when(self.use_case).fetch().thenReturn([])
+        expected_body = {"status": "ok", "data": []}
+        self.resource.on_get(request, response)
+        self.assertEqual(falcon.HTTP_200, response.status)
+        self.assertEqual(expected_body, json.loads(response.text))

@@ -10,6 +10,7 @@ from gcmanager.serializers import GiftCardAssetSummarySerializer
 from gcmanager.serializers import GiftCardCreateRequestSerializer
 from gcmanager.serializers import GiftCardSerializer
 from gcmanager.usecases import AddGiftCardUseCase
+from gcmanager.usecases import DenominationFetcherUseCase
 from gcmanager.usecases import FetchUnusedGiftCardsUseCase
 from gcmanager.usecases import GiftCardAssetInformationUseCase
 
@@ -57,3 +58,13 @@ class GiftCardResource:
         except GiftCardAlreadyExists:
             raise errors.HTTPBadRequest
         response.status = falcon.HTTP_201
+
+
+class DenominationResource:
+    def __init__(self, use_case: DenominationFetcherUseCase) -> None:
+        self._use_case = use_case
+
+    def on_get(self, request: falcon.Request, response: falcon.Response) -> None:
+        denominations = self._use_case.fetch()
+        response.status = falcon.HTTP_200
+        response.text = SuccessfulResponse(denominations).serialize()
