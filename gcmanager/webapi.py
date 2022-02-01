@@ -20,6 +20,7 @@ from gcmanager.usecases import DenominationFetcherUseCase
 from gcmanager.usecases import EditGiftCardUseCase
 from gcmanager.usecases import FetchUnusedGiftCardsUseCase
 from gcmanager.usecases import GiftCardAssetInformationUseCase
+from gcmanager.usecases import MarkGiftCardUsedUseCase
 from gcmanager.usecases import NearExpiryGiftCardFetcherUseCase
 
 
@@ -120,3 +121,20 @@ class NearExpiryGiftCardResource:
         serialized_data = self._serializer.dump(gift_card)
         response.status = falcon.HTTP_200
         response.text = SuccessfulResponse(serialized_data).serialize()
+
+
+class MarkGiftCardUsedResource:
+    def __init__(self, use_case: MarkGiftCardUsedUseCase) -> None:
+        self._use_case = use_case
+
+    def on_post(
+        self,
+        request: falcon.Request,
+        response: falcon.Response,
+        gift_card_id: GiftCardID,
+    ) -> None:
+        try:
+            self._use_case.mark_used(gift_card_id)
+        except GiftCardNotFound:
+            raise errors.HTTPBadRequest
+        response.status = falcon.HTTP_200

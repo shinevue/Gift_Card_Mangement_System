@@ -17,6 +17,7 @@ from gcmanager.exceptions import GiftCardNotFoundForDenomination
 from gcmanager.webapi import DenominationResource
 from gcmanager.webapi import GiftCardAssetInformationResource
 from gcmanager.webapi import GiftCardResource
+from gcmanager.webapi import MarkGiftCardUsedResource
 from gcmanager.webapi import NearExpiryGiftCardResource
 from tests.unit.factories import GiftCardCreateRequestFactory
 from tests.unit.factories import GiftCardFactory
@@ -292,3 +293,24 @@ class TestNearExpiryGiftCardResource(TestCase):
         response = falcon.Response()
         with self.assertRaises(errors.HTTPNotFound):
             self.resource.on_get(request, response, self.gift_card.denomination)
+
+
+class TestMarkGiftCardUsedResource(TestCase):
+    def setUp(self) -> None:
+        self.use_case = mock()
+        self.resource = MarkGiftCardUsedResource(self.use_case)
+        self.gift_card = GiftCardFactory()
+
+    def test_returns_200_when_gift_card_mark_used(self) -> None:
+        request = falcon.testing.create_req()
+        response = falcon.Response()
+        when(self.use_case).mark_used(self.gift_card.id).thenReturn(None)
+        self.resource.on_post(request, response, self.gift_card.id)
+        self.assertEqual(falcon.HTTP_200, response.status)
+
+    def test_raises_400_when_gift_card_not_found(self) -> None:
+        request = falcon.testing.create_req()
+        response = falcon.Response()
+        when(self.use_case).mark_used(self.gift_card.id).thenRaise(GiftCardNotFound)
+        with self.assertRaises(errors.HTTPBadRequest):
+            self.resource.on_post(request, response, self.gift_card.id)
