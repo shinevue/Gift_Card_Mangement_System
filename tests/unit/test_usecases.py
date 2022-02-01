@@ -12,10 +12,12 @@ from gcmanager.exceptions import GiftCardNotFoundForDenomination
 from gcmanager.usecases import AddGiftCardUseCase
 from gcmanager.usecases import DenominationFetcherUseCase
 from gcmanager.usecases import EditGiftCardUseCase
+from gcmanager.usecases import FetchUnusedGiftCardsUseCase
 from gcmanager.usecases import GiftCardAssetInformationUseCase
 from gcmanager.usecases import MarkGiftCardUsedUseCase
 from gcmanager.usecases import NearExpiryGiftCardFetcherUseCase
 from tests.unit.factories import GiftCardAssetSummaryFactory
+from tests.unit.factories import GiftCardCreateRequestFactory
 from tests.unit.factories import GiftCardFactory
 from tests.unit.factories import GiftCardUpdateRequestFactory
 
@@ -36,23 +38,33 @@ class TestAddGiftCardUseCase(TestCase):
     def setUp(self) -> None:
         self.gc_repository = mock()
         self.use_case = AddGiftCardUseCase(self.gc_repository)
-        self.gift_card = GiftCardFactory()
+        self.gift_card_create_request = GiftCardCreateRequestFactory()
+        self.gift_card = GiftCardFactory(
+            redeem_code=self.gift_card_create_request.redeem_code,
+            date_of_issue=self.gift_card_create_request.date_of_issue,
+            pin=self.gift_card_create_request.pin,
+            source=self.gift_card_create_request.source,
+            denomination=self.gift_card_create_request.denomination,
+        )
 
     def test_returns_none_when_gift_card_created(self) -> None:
         when(self.gc_repository).get_by_redeem_code(
-            self.gift_card.redeem_code,
+            self.gift_card_create_request.redeem_code,
         ).thenReturn(None)
         when(self.gc_repository).create(self.gift_card).thenReturn(None)
-        self.use_case.create(self.gift_card)
+        when(self.gc_repository).next_id().thenReturn(self.gift_card.id)
+        when(self.gc_repository).timestamp().thenReturn(self.gift_card.timestamp)
+        self.use_case.create(self.gift_card_create_request)
         verify(self.gc_repository).create(self.gift_card)
 
     def test_raises_when_gift_card_already_exists(self) -> None:
-        gift_card = GiftCardFactory()
-        when(self.gc_repository).get_by_redeem_code(gift_card.redeem_code).thenReturn(
-            gift_card,
+        when(self.gc_repository).get_by_redeem_code(
+            self.gift_card_create_request.redeem_code,
+        ).thenReturn(
+            self.gift_card,
         )
         with self.assertRaises(GiftCardAlreadyExists):
-            self.use_case.create(gift_card)
+            self.use_case.create(self.gift_card_create_request)
 
 
 class TestDenominationFetcherUseCase(TestCase):
@@ -142,3 +154,20 @@ class TestEditGiftCardUseCase(TestCase):
         when(self.gc_repository).get_by_id(gift_card.id).thenReturn(gift_card)
         with self.assertRaises(GiftCardAlreadyUsed):
             self.use_case.edit_gc(gift_card_update_request)
+
+
+class TestFetchUnusedGiftCardsUseCase(TestCase):
+    def setUp(self) -> None:
+        self.gc_repository = mock()
+        self.use_case = FetchUnusedGiftCardsUseCase(self.gc_repository)
+        self.gift_cards = GiftCardFactory.build_batch(size=4, is_used=False)
+
+    def test_returns_unused_gift_cards_when_called(self) -> None:
+        when(self.gc_repository).get_unused().thenReturn(self.gift_cards)
+        actual = self.use_case.fetch()
+        self.assertEqual(self.gift_cards, actual)
+
+    def test_returns_empty_list_when_called(self) -> None:
+        when(self.gc_repository).get_unused().thenReturn([])
+        actual = self.use_case.fetch()
+        self.assertEqual([], actual)

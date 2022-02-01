@@ -8,7 +8,8 @@ license = "MIT"
 [tool.poetry.dependencies]
 python = "3.10.0"
 kink = "^0.6.2"
-Flask = "^2.0.2"
+falcon = "^3.0.1"
+marshmallow = "^3.14.1"
 
 [tool.poetry.dev-dependencies]
 coverage = "^6.2"
@@ -34,7 +35,7 @@ include = '\.pyi?$'
 python_version = "3.10"
 warn_return_any = true
 warn_unused_configs = true
-files = "gcmanager/,tests/"
+files = "gcmanager/"
 disallow_untyped_defs = true
 ignore_missing_imports = true
 
