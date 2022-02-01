@@ -5,14 +5,19 @@ from falcon import errors
 from marshmallow import ValidationError
 
 from gcmanager.domain import Denomination
+from gcmanager.domain import GiftCardID
 from gcmanager.domain import SuccessfulResponse
 from gcmanager.exceptions import GiftCardAlreadyExists
+from gcmanager.exceptions import GiftCardAlreadyUsed
+from gcmanager.exceptions import GiftCardNotFound
 from gcmanager.exceptions import GiftCardNotFoundForDenomination
 from gcmanager.serializers import GiftCardAssetSummarySerializer
 from gcmanager.serializers import GiftCardCreateRequestSerializer
 from gcmanager.serializers import GiftCardSerializer
+from gcmanager.serializers import GiftCardUpdateRequestSerializer
 from gcmanager.usecases import AddGiftCardUseCase
 from gcmanager.usecases import DenominationFetcherUseCase
+from gcmanager.usecases import EditGiftCardUseCase
 from gcmanager.usecases import FetchUnusedGiftCardsUseCase
 from gcmanager.usecases import GiftCardAssetInformationUseCase
 from gcmanager.usecases import NearExpiryGiftCardFetcherUseCase
@@ -35,11 +40,14 @@ class GiftCardResource:
         self,
         create_use_case: AddGiftCardUseCase,
         get_unused_use_case: FetchUnusedGiftCardsUseCase,
+        update_use_case: EditGiftCardUseCase,
     ) -> None:
         self._create_use_case = create_use_case
         self._get_unused_use_case = get_unused_use_case
+        self._update_use_case = update_use_case
         self._dump_serializer = GiftCardSerializer()
-        self._load_serializer = GiftCardCreateRequestSerializer()
+        self._create_serializer = GiftCardCreateRequestSerializer()
+        self._update_serializer = GiftCardUpdateRequestSerializer()
 
     def on_get(self, request: falcon.Request, response: falcon.Response) -> None:
         gift_cards = self._get_unused_use_case.fetch()
@@ -50,7 +58,7 @@ class GiftCardResource:
     def on_post(self, request: falcon.Request, response: falcon.Response) -> None:
         payload = json.loads(request.bounded_stream.read())
         try:
-            gift_card_create_request = self._load_serializer.load(payload)
+            gift_card_create_request = self._create_serializer.load(payload)
         except ValidationError as validation_error:
             raise errors.HTTPBadRequest(
                 title="Validation Error",
@@ -61,6 +69,27 @@ class GiftCardResource:
         except GiftCardAlreadyExists:
             raise errors.HTTPBadRequest
         response.status = falcon.HTTP_201
+
+    def on_put(
+        self,
+        request: falcon.Request,
+        response: falcon.Response,
+        gift_card_id: GiftCardID,
+    ) -> None:
+        payload = json.loads(request.bounded_stream.read())
+        try:
+            update_request = self._update_serializer.load(
+                {"id": gift_card_id, **payload},
+            )
+        except ValidationError:
+            raise errors.HTTPBadRequest
+        try:
+            self._update_use_case.edit_gc(update_request)
+        except GiftCardNotFound:
+            raise errors.HTTPNotFound
+        except GiftCardAlreadyUsed:
+            raise errors.HTTPBadRequest
+        response.status = falcon.HTTP_200
 
 
 class DenominationResource:

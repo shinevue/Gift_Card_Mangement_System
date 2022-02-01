@@ -6,6 +6,7 @@ from marshmallow import post_load
 from marshmallow import validate
 
 from gcmanager.domain import GiftCardCreateRequest
+from gcmanager.domain import GiftCardUpdateRequest
 from gcmanager.validators import date_not_more_than_equal_to_a_year_old
 
 
@@ -54,3 +55,33 @@ class GiftCardCreateRequestSerializer(Schema):
         **kwargs: Any,
     ) -> GiftCardCreateRequest:
         return GiftCardCreateRequest(**data)
+
+
+class GiftCardUpdateRequestSerializer(Schema):
+    id = fields.UUID(required=True)
+    redeem_code = fields.Str(
+        required=True,
+        validate=[validate.Length(equal=14), validate.Regexp(r"[A-Z0-9]{14}")],
+    )
+    date_of_issue = fields.Date(
+        required=True,
+        validate=[date_not_more_than_equal_to_a_year_old],
+    )
+    pin = fields.Int(
+        required=True,
+        validate=[validate.Range(min=1_000_000_000_000_000, max=9_999_999_999_999_999)],
+    )
+    source = fields.Str(required=True)
+    denomination = fields.Int(
+        required=True,
+        validate=[validate.Range(min=10, max=10_000)],
+    )
+
+    @post_load
+    def make_request(
+        self,
+        data: dict,
+        many: bool,
+        **kwargs: Any,
+    ) -> GiftCardUpdateRequest:
+        return GiftCardUpdateRequest(**data)

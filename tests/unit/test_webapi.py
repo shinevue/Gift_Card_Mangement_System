@@ -11,6 +11,8 @@ from gcmanager.domain import Denomination
 from gcmanager.domain import GiftCardAssetSummary
 from gcmanager.domain import Money
 from gcmanager.exceptions import GiftCardAlreadyExists
+from gcmanager.exceptions import GiftCardAlreadyUsed
+from gcmanager.exceptions import GiftCardNotFound
 from gcmanager.exceptions import GiftCardNotFoundForDenomination
 from gcmanager.webapi import DenominationResource
 from gcmanager.webapi import GiftCardAssetInformationResource
@@ -19,6 +21,7 @@ from gcmanager.webapi import NearExpiryGiftCardResource
 from tests.unit.factories import GiftCardCreateRequestFactory
 from tests.unit.factories import GiftCardFactory
 from tests.unit.factories import GiftCardPayloadFactory
+from tests.unit.factories import GiftCardUpdateRequestFactory
 
 
 class TestGiftCardAssetInformationResource(TestCase):
@@ -50,9 +53,11 @@ class TestGiftCardResource(TestCase):
         self.maxDiff = None
         self.create_use_case = mock()
         self.get_unused_gc_use_case = mock()
+        self.update_gc_use_case = mock()
         self.resource = GiftCardResource(
             self.create_use_case,
             self.get_unused_gc_use_case,
+            self.update_gc_use_case,
         )
         self.gift_cards = GiftCardFactory.build_batch(5, is_used=False)
 
@@ -142,6 +147,80 @@ class TestGiftCardResource(TestCase):
             with self.subTest(payload=payload):
                 with self.assertRaises(errors.HTTPBadRequest):
                     self.resource.on_post(request, response)
+
+    def test_returns_200_when_gift_card_updated_successfully(self) -> None:
+        update_request = GiftCardUpdateRequestFactory()
+        payload = GiftCardPayloadFactory(
+            redeem_code=update_request.redeem_code,
+            date_of_issue=update_request.date_of_issue.isoformat(),
+            pin=update_request.pin,
+            source=update_request.source,
+            denomination=update_request.denomination,
+        )
+        request = falcon.testing.create_req(body=json.dumps(payload))
+        response = falcon.Response()
+        when(self.update_gc_use_case).edit_gc(update_request).thenReturn(None)
+        self.resource.on_put(request, response, update_request.id)
+        self.assertEqual(falcon.HTTP_200, response.status)
+
+    def test_raises_404_on_update_when_gift_card_not_found(self) -> None:
+        update_request = GiftCardUpdateRequestFactory()
+        payload = GiftCardPayloadFactory(
+            redeem_code=update_request.redeem_code,
+            date_of_issue=update_request.date_of_issue.isoformat(),
+            pin=update_request.pin,
+            source=update_request.source,
+            denomination=update_request.denomination,
+        )
+        request = falcon.testing.create_req(body=json.dumps(payload))
+        response = falcon.Response()
+        when(self.update_gc_use_case).edit_gc(update_request).thenRaise(
+            GiftCardNotFound,
+        )
+        with self.assertRaises(errors.HTTPNotFound):
+            self.resource.on_put(request, response, update_request.id)
+
+    def test_raises_400_on_update_when_gift_card_already_used(self) -> None:
+        update_request = GiftCardUpdateRequestFactory()
+        payload = GiftCardPayloadFactory(
+            redeem_code=update_request.redeem_code,
+            date_of_issue=update_request.date_of_issue.isoformat(),
+            pin=update_request.pin,
+            source=update_request.source,
+            denomination=update_request.denomination,
+        )
+        request = falcon.testing.create_req(body=json.dumps(payload))
+        response = falcon.Response()
+        when(self.update_gc_use_case).edit_gc(update_request).thenRaise(
+            GiftCardAlreadyUsed,
+        )
+        with self.assertRaises(errors.HTTPBadRequest):
+            self.resource.on_put(request, response, update_request.id)
+
+    def test_raises_400_on_update_when_payload_invalid(self) -> None:
+        payloads = [
+            GiftCardPayloadFactory(redeem_code_length_greater=True),
+            GiftCardPayloadFactory(redeem_code_length_lesser=True),
+            GiftCardPayloadFactory(redeem_code_not_alphanumeric=True),
+            GiftCardPayloadFactory(date_of_issue_one_year_past=True),
+            GiftCardPayloadFactory(pin_length_greater=True),
+            GiftCardPayloadFactory(pin_length_lesser=True),
+            GiftCardPayloadFactory(denomination=9),
+            GiftCardPayloadFactory(denomination=10001),
+        ]
+        for payload in payloads:
+            update_request = GiftCardUpdateRequestFactory(
+                redeem_code=payload["redeem_code"],
+                date_of_issue=payload["date_of_issue"],
+                pin=payload["pin"],
+                source=payload["source"],
+                denomination=payload["denomination"],
+            )
+            request = testing.create_req(body=json.dumps(payload, default=str))
+            response = falcon.Response()
+            with self.subTest(payload=payload):
+                with self.assertRaises(errors.HTTPBadRequest):
+                    self.resource.on_put(request, response, update_request.id)
 
 
 class TestDenominationResource(TestCase):
