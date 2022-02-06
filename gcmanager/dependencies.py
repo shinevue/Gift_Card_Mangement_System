@@ -1,4 +1,5 @@
 import os
+from urllib.parse import quote
 
 from kink import Container
 from pymongo import MongoClient
@@ -35,7 +36,12 @@ def _build_mongo_db_connection_string(container: Container) -> str:
             "environment variables required to "
             "build mongodb connection string are missing",
         )
-    return "mongodb://%s:%s@%s:%s/" % (username, password, host, port)
+    return "mongodb://%s:%s@%s:%s/" % (
+        quote(username),
+        quote(password),
+        host,
+        port,
+    )
 
 
 def _build_mongodb_client(container: Container) -> None:
