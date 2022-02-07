@@ -70,6 +70,13 @@ def _build_mongodb_repository(container: Container) -> None:
     )
 
 
+def _build_datasource_layer(container: Container) -> None:
+    _build_mongodb_client(container)
+    _build_mongodb_database(container)
+    _build_mongodb_collection(container)
+    _build_mongodb_repository(container)
+
+
 def _build_use_cases(container: Container) -> None:
     repository = container[GiftCardMongoDBRepository]
     container[
@@ -122,10 +129,7 @@ def build_dependency_container() -> Container:
     settings_klass = settings_selector(app_environment)
     settings = settings_klass.load()
     container[Settings] = settings
-    _build_mongodb_client(container)
-    _build_mongodb_database(container)
-    _build_mongodb_collection(container)
-    _build_mongodb_repository(container)
+    _build_datasource_layer(container)
     _build_use_cases(container)
     _build_views(container)
     return container
