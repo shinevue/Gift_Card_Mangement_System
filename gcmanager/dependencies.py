@@ -59,11 +59,9 @@ def _build_mongodb_database(container: Container) -> None:
 
 
 def _build_mongodb_collection(container: Container) -> None:
-    mongo_client = container[MongoClient]
+    database = container[Database]
     settings = container[Settings]
-    container[Collection] = lambda c: mongo_client[
-        settings["MONGODB_GC_COLLECTION_NAME"]
-    ]
+    container[Collection] = lambda c: database[settings["MONGODB_GC_COLLECTION_NAME"]]
 
 
 def _build_mongodb_repository(container: Container) -> None:

@@ -29,8 +29,8 @@ class MongoDBAndAppAwareTestCase(TestCase):
     def setUp(self) -> None:
         super(MongoDBAndAppAwareTestCase, self).setUp()
         self.app = create_app()
-        self.db = self.db_client["test-db"]
-        self.collection = self.db["test-collection"]
+        self.db = self.db_client["testdb"]
+        self.collection = self.db["testcollection"]
 
     def tearDown(self) -> None:
         self.collection.drop()
