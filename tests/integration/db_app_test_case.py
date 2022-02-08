@@ -16,7 +16,11 @@ class MongoDBAndAppAwareTestCase(TestCase):
     @classmethod
     def setUpClass(cls) -> None:
         os.environ["APP_ENV"] = "TEST"
-        cls.db_client = MongoClient("mongodb://testing_user:testing@localhost:27020/")
+        cls.db_client = MongoClient(
+            "mongodb://testing_user:testing@localhost:27020/",
+            uuidRepresentation="standard",
+        )
+        cls.db_client.drop_database("testdb")
 
     @classmethod
     def tearDownClass(cls) -> None:

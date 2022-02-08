@@ -46,7 +46,10 @@ def _build_mongo_db_connection_string(container: Container) -> str:
 
 def _build_mongodb_client(container: Container) -> None:
     mongodb_connection_string = _build_mongo_db_connection_string(container)
-    container[MongoClient] = lambda c: MongoClient(mongodb_connection_string)
+    container[MongoClient] = lambda c: MongoClient(
+        mongodb_connection_string,
+        uuidRepresentation="standard",
+    )
 
 
 def _build_mongodb_database(container: Container) -> None:
