@@ -25,8 +25,8 @@ class TestAppSettings(AppSettings):
                 "MONGODB_PASSWORD": "testing",
                 "MONGODB_HOST": "localhost",
                 "MONGODB_PORT": "27020",
-                "MONGODB_DBNAME": "test-db",
-                "MONGODB_GC_COLLECTION_NAME": "test-collection",
+                "MONGODB_DBNAME": "testdb",
+                "MONGODB_GC_COLLECTION_NAME": "testcollection",
             },
         )
 
