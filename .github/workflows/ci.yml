@@ -34,6 +34,13 @@ jobs:
         run: poetry run flake8 .
       - name: Common Security Checks (bandit)
         run: poetry run bandit -r gcmanager tests --verbose
+      - name: Start MongoDB
+        uses: supercharge/mongodb-github-action@1.7.0
+        with:
+          mongodb-version: '5.0.6'
+          mongodb-username: testing_user
+          mongodb-password: testing
+          mongodb-port: 27020
       - name: Testing
         run: |
           poetry run coverage erase
