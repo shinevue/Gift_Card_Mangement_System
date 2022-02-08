@@ -1,6 +1,7 @@
 import os
 
 from falcon.testing import TestCase
+from mockito import when
 from pymongo import MongoClient
 
 from gcmanager.app import create_app
@@ -15,7 +16,7 @@ class MongoDBAndAppAwareTestCase(TestCase):
 
     @classmethod
     def setUpClass(cls) -> None:
-        os.environ["APP_ENV"] = "TEST"
+        when(os.environ).get("APP_ENV").thenReturn("TEST")
         cls.db_client = MongoClient(
             "mongodb://testing_user:testing@localhost:27020/",
             uuidRepresentation="standard",
