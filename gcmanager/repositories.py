@@ -11,6 +11,7 @@ from gcmanager.domain import GiftCard
 from gcmanager.domain import GiftCardAssetSummary
 from gcmanager.domain import GiftCardID
 from gcmanager.domain import GiftCardUpdateRequest
+from gcmanager.domain import Money
 from gcmanager.domain import RedeemCode
 
 
@@ -68,7 +69,38 @@ class GiftCardMongoDBRepository(GiftCardRepository):
         self._collection = gc_collection
 
     def get_summary(self) -> GiftCardAssetSummary:
-        pass
+        total_aggregation = list(
+            self._collection.aggregate(
+                [
+                    {"$group": {"_id": None, "total": {"$sum": "$denomination"}}},
+                    {"$project": {"_id": 0}},
+                ],
+            ),
+        )
+
+        if not total_aggregation:
+            return GiftCardAssetSummary(
+                total=Money(0),
+                used=Money(0),
+            )
+
+        used_aggregation = list(
+            self._collection.aggregate(
+                [
+                    {"$match": {"is_used": True}},
+                    {"$group": {"_id": None, "used": {"$sum": "$denomination"}}},
+                    {"$project": {"_id": 0}},
+                ],
+            ),
+        )
+
+        total = total_aggregation[0]["total"]
+        if not used_aggregation:
+            used = 0
+        else:
+            used = used_aggregation[0]["used"]
+
+        return GiftCardAssetSummary(total=Money(total), used=Money(used))
 
     def next_id(self) -> uuid.UUID:
         pass
