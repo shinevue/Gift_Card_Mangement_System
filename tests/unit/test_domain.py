@@ -6,7 +6,7 @@ from gcmanager.domain import Denomination
 from gcmanager.domain import GiftCardAssetSummary
 from gcmanager.domain import Money
 from gcmanager.domain import SuccessfulResponse
-from tests.unit.factories import GiftCardFactory
+from tests.factories import GiftCardFactory
 
 
 class TestGiftCard(TestCase):

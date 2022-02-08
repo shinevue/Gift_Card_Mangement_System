@@ -19,10 +19,10 @@ from gcmanager.webapi import GiftCardAssetInformationResource
 from gcmanager.webapi import GiftCardResource
 from gcmanager.webapi import MarkGiftCardUsedResource
 from gcmanager.webapi import NearExpiryGiftCardResource
-from tests.unit.factories import GiftCardCreateRequestFactory
-from tests.unit.factories import GiftCardFactory
-from tests.unit.factories import GiftCardPayloadFactory
-from tests.unit.factories import GiftCardUpdateRequestFactory
+from tests.factories import GiftCardCreateRequestFactory
+from tests.factories import GiftCardFactory
+from tests.factories import GiftCardPayloadFactory
+from tests.factories import GiftCardUpdateRequestFactory
 
 
 class TestGiftCardAssetInformationResource(TestCase):

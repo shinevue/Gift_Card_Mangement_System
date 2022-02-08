@@ -16,10 +16,10 @@ from gcmanager.usecases import FetchUnusedGiftCardsUseCase
 from gcmanager.usecases import GiftCardAssetInformationUseCase
 from gcmanager.usecases import MarkGiftCardUsedUseCase
 from gcmanager.usecases import NearExpiryGiftCardFetcherUseCase
-from tests.unit.factories import GiftCardAssetSummaryFactory
-from tests.unit.factories import GiftCardCreateRequestFactory
-from tests.unit.factories import GiftCardFactory
-from tests.unit.factories import GiftCardUpdateRequestFactory
+from tests.factories import GiftCardAssetSummaryFactory
+from tests.factories import GiftCardCreateRequestFactory
+from tests.factories import GiftCardFactory
+from tests.factories import GiftCardUpdateRequestFactory
 
 
 class TestGiftCardAssetInformationUseCase(TestCase):
