@@ -109,7 +109,14 @@ class GiftCardMongoDBRepository(GiftCardRepository):
         pass
 
     def get_available_denominations(self) -> list[Denomination]:
-        pass
+        aggregation = self._collection.aggregate(
+            [
+                {"$match": {"is_used": False}},
+                {"$group": {"_id": "$denomination"}},
+                {"$sort": {"_id": 1}},
+            ],
+        )
+        return [result["_id"] for result in aggregation]
 
     def get_near_expiry_gift_card(
         self,

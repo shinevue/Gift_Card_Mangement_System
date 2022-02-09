@@ -75,3 +75,49 @@ class TestMarkGiftCardUsedAPI(MongoDBAndAppAwareTestCase):
         self.collection.insert_one(serialized_gift_card)
         response = self.simulate_post(f"/api/giftcards/{gift_card.id}/mark-used/")
         self.assertEqual(falcon.HTTP_400, response.status)
+
+
+class TestDenominationAPI(MongoDBAndAppAwareTestCase):
+    def setUp(self) -> None:
+        super(TestDenominationAPI, self).setUp()
+        self.api_path = "/api/giftcards/denominations/"
+
+    def test_returns_empty_list_when_db_empty(self) -> None:
+        response = self.simulate_get(self.api_path)
+        self.assertEqual({"status": "ok", "data": []}, response.json)
+
+    def test_returns_empty_list_when_db_has_gcs(self) -> None:
+        gift_cards = [
+            GiftCardFactory(is_used=False, denomination=100),
+            GiftCardFactory(is_used=False, denomination=200),
+            GiftCardFactory(is_used=False, denomination=300),
+            GiftCardFactory(is_used=False, denomination=400),
+            GiftCardFactory(is_used=False, denomination=500),
+            GiftCardFactory(is_used=False, denomination=1000),
+            GiftCardFactory(is_used=True, denomination=200),
+            GiftCardFactory(is_used=True, denomination=2000),
+            GiftCardFactory(is_used=True, denomination=2000),
+            GiftCardFactory(is_used=True, denomination=2000),
+            GiftCardFactory(is_used=True, denomination=2000),
+            GiftCardFactory(is_used=True, denomination=2000),
+            GiftCardFactory(is_used=True, denomination=2000),
+        ]
+        serialized_gift_cards = [
+            prepare_to_be_inserted_gift_card(gift_card) for gift_card in gift_cards
+        ]
+        expected_denominations = [100, 200, 300, 400, 500, 1000]
+        self.collection.insert_many(serialized_gift_cards)
+        response = self.simulate_get(self.api_path)
+        self.assertEqual(
+            {"status": "ok", "data": expected_denominations},
+            response.json,
+        )
+
+    def test_returns_empty_list_when_all_gift_cards_used(self) -> None:
+        response = self.simulate_get(self.api_path)
+        gift_cards = GiftCardFactory.build_batch(10, is_used=True)
+        serialized_gift_cards = [
+            prepare_to_be_inserted_gift_card(gift_card) for gift_card in gift_cards
+        ]
+        self.collection.insert_many(serialized_gift_cards)
+        self.assertEqual({"status": "ok", "data": []}, response.json)
