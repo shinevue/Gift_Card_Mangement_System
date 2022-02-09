@@ -128,6 +128,12 @@ class TestMarkGiftCardUsedUseCase(TestCase):
         with self.assertRaises(GiftCardNotFound):
             self.use_case.mark_used(gift_card.id)
 
+    def test_raises_when_gift_card_is_already_used(self) -> None:
+        gift_card = GiftCardFactory(is_used=True)
+        when(self.gc_repository).get_by_id(gift_card.id).thenReturn(gift_card)
+        with self.assertRaises(GiftCardAlreadyUsed):
+            self.use_case.mark_used(gift_card.id)
+
 
 class TestEditGiftCardUseCase(TestCase):
     def setUp(self) -> None:
