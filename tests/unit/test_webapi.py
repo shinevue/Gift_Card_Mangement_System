@@ -314,3 +314,10 @@ class TestMarkGiftCardUsedResource(TestCase):
         when(self.use_case).mark_used(self.gift_card.id).thenRaise(GiftCardNotFound)
         with self.assertRaises(errors.HTTPBadRequest):
             self.resource.on_post(request, response, self.gift_card.id)
+
+    def test_raises_400_when_gift_card_already_used(self) -> None:
+        request = falcon.testing.create_req()
+        response = falcon.Response()
+        when(self.use_case).mark_used(self.gift_card.id).thenRaise(GiftCardAlreadyUsed)
+        with self.assertRaises(errors.HTTPBadRequest):
+            self.resource.on_post(request, response, self.gift_card.id)

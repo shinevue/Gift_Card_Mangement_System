@@ -135,6 +135,6 @@ class MarkGiftCardUsedResource:
     ) -> None:
         try:
             self._use_case.mark_used(gift_card_id)
-        except GiftCardNotFound:
+        except (GiftCardNotFound, GiftCardAlreadyUsed):
             raise errors.HTTPBadRequest
         response.status = falcon.HTTP_200
