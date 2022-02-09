@@ -1,37 +1,14 @@
-from dataclasses import asdict
-from datetime import datetime
-
 import falcon
 
-from gcmanager.domain import GiftCard
 from tests.factories import GiftCardFactory
 from tests.integration.db_app_test_case import MongoDBAndAppAwareTestCase
+from tests.integration.utils import prepare_to_be_inserted_gift_card
 
 
 class TestGiftCardAssetInformationAPI(MongoDBAndAppAwareTestCase):
     def setUp(self) -> None:
         super(TestGiftCardAssetInformationAPI, self).setUp()
         self.api_path = "/api/giftcards/assets/"
-
-    @staticmethod
-    def _prepare_to_be_inserted_gift_cards(gift_cards: list[GiftCard]) -> list[dict]:
-        serialized_gift_cards = []
-        for gift_card in gift_cards:
-            serialized_gift_card = asdict(gift_card)
-            date_of_issue = serialized_gift_card.pop("date_of_issue")
-            serialized_gift_card["date_of_issue"] = datetime(
-                year=date_of_issue.year,
-                month=date_of_issue.month,
-                day=date_of_issue.day,
-                hour=0,
-                minute=0,
-                second=0,
-                microsecond=0,
-            )
-            identity = serialized_gift_card.pop("id")
-            serialized_gift_card.update({"_id": identity})
-            serialized_gift_cards.append(serialized_gift_card)
-        return serialized_gift_cards
 
     def test_returns_zero_for_all_when_db_empty(self) -> None:
         response = self.simulate_get(self.api_path)
@@ -44,7 +21,9 @@ class TestGiftCardAssetInformationAPI(MongoDBAndAppAwareTestCase):
 
     def test_returns_expected_data_when_no_gift_card_is_used(self) -> None:
         gift_cards = GiftCardFactory.build_batch(10, denomination=500)
-        serialized_gift_cards = self._prepare_to_be_inserted_gift_cards(gift_cards)
+        serialized_gift_cards = [
+            prepare_to_be_inserted_gift_card(gift_card) for gift_card in gift_cards
+        ]
         self.collection.insert_many(serialized_gift_cards)
         response = self.simulate_get(self.api_path)
         expected_response = {
@@ -61,9 +40,10 @@ class TestGiftCardAssetInformationAPI(MongoDBAndAppAwareTestCase):
             denomination=1000,
         )
         unused_gift_cards = GiftCardFactory.build_batch(5, denomination=1000)
-        serialized_gift_cards = self._prepare_to_be_inserted_gift_cards(
-            used_gift_cards + unused_gift_cards,
-        )
+        serialized_gift_cards = [
+            prepare_to_be_inserted_gift_card(gift_card)
+            for gift_card in used_gift_cards + unused_gift_cards
+        ]
         self.collection.insert_many(serialized_gift_cards)
         response = self.simulate_get(self.api_path)
         expected_response = {
@@ -72,3 +52,26 @@ class TestGiftCardAssetInformationAPI(MongoDBAndAppAwareTestCase):
         }
         self.assertEqual(falcon.HTTP_OK, response.status)
         self.assertEqual(expected_response, response.json)
+
+
+class TestMarkGiftCardUsedAPI(MongoDBAndAppAwareTestCase):
+    def test_returns_200_when_gift_card_successfully_mark_used(self) -> None:
+        gift_card = GiftCardFactory()
+        serialized_gift_card = prepare_to_be_inserted_gift_card(gift_card)
+        self.collection.insert_one(serialized_gift_card)
+        response = self.simulate_post(f"/api/giftcards/{gift_card.id}/mark-used/")
+        gift_card_in_db = self.collection.find_one({"_id": gift_card.id})
+        self.assertEqual(falcon.HTTP_200, response.status)
+        self.assertTrue(gift_card_in_db["is_used"])
+
+    def test_returns_400_when_gift_card_not_found(self) -> None:
+        gift_card = GiftCardFactory()
+        response = self.simulate_post(f"/api/giftcards/{gift_card.id}/mark-used/")
+        self.assertEqual(falcon.HTTP_400, response.status)
+
+    def test_returns_400_when_gift_card_already_used(self) -> None:
+        gift_card = GiftCardFactory(is_used=True)
+        serialized_gift_card = prepare_to_be_inserted_gift_card(gift_card)
+        self.collection.insert_one(serialized_gift_card)
+        response = self.simulate_post(f"/api/giftcards/{gift_card.id}/mark-used/")
+        self.assertEqual(falcon.HTTP_400, response.status)

@@ -121,10 +121,15 @@ class GiftCardMongoDBRepository(GiftCardRepository):
         pass
 
     def mark_used(self, gift_card_id: GiftCardID) -> None:
-        pass
+        self._collection.update_one({"_id": gift_card_id}, {"$set": {"is_used": True}})
 
     def get_by_id(self, gift_card_id: GiftCardID) -> Optional[GiftCard]:
-        pass
+        gc_dict = self._collection.find_one({"_id": gift_card_id})
+        if not gc_dict:
+            return None
+        gc_id = gc_dict.pop("_id")
+        date_of_issue = gc_dict.pop("date_of_issue").date()
+        return GiftCard(**{"id": gc_id, "date_of_issue": date_of_issue, **gc_dict})
 
     def get_by_redeem_code(self, redeem_code: RedeemCode) -> Optional[GiftCard]:
         pass
