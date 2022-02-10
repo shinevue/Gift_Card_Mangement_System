@@ -4,6 +4,7 @@ from abc import ABC
 from abc import abstractmethod
 from typing import Optional
 
+from pymongo import ASCENDING
 from pymongo.collection import Collection
 
 from gcmanager.domain import Denomination
@@ -122,7 +123,15 @@ class GiftCardMongoDBRepository(GiftCardRepository):
         self,
         denomination: Denomination,
     ) -> Optional[GiftCard]:
-        pass
+        result = list(
+            self._collection.find({"is_used": False})
+            .sort("date_of_issue", ASCENDING)
+            .limit(1)
+        )
+        if not result:
+            return None
+        gift_card_dict = result[0]
+        return self._make_gc(gift_card_dict)
 
     def update(self, gift_card_request: GiftCardUpdateRequest) -> None:
         pass
@@ -134,6 +143,10 @@ class GiftCardMongoDBRepository(GiftCardRepository):
         gc_dict = self._collection.find_one({"_id": gift_card_id})
         if not gc_dict:
             return None
+        return self._make_gc(gc_dict)
+
+    @staticmethod
+    def _make_gc(gc_dict: dict) -> GiftCard:
         gc_id = gc_dict.pop("_id")
         date_of_issue = gc_dict.pop("date_of_issue").date()
         return GiftCard(**{"id": gc_id, "date_of_issue": date_of_issue, **gc_dict})

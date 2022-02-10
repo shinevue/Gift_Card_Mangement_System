@@ -1,3 +1,5 @@
+import datetime
+
 import falcon
 
 from tests.factories import GiftCardFactory
@@ -76,6 +78,11 @@ class TestMarkGiftCardUsedAPI(MongoDBAndAppAwareTestCase):
         response = self.simulate_post(f"/api/giftcards/{gift_card.id}/mark-used/")
         self.assertEqual(falcon.HTTP_400, response.status)
 
+    def test_returns_404_when_gift_card_id_invalid(self) -> None:
+        gift_card = GiftCardFactory(id="123kjasdjlk")
+        response = self.simulate_post(f"/api/giftcards/{gift_card.id}/mark-used/")
+        self.assertEqual(falcon.HTTP_404, response.status)
+
 
 class TestDenominationAPI(MongoDBAndAppAwareTestCase):
     def setUp(self) -> None:
@@ -85,6 +92,7 @@ class TestDenominationAPI(MongoDBAndAppAwareTestCase):
     def test_returns_empty_list_when_db_empty(self) -> None:
         response = self.simulate_get(self.api_path)
         self.assertEqual({"status": "ok", "data": []}, response.json)
+        self.assertEqual(falcon.HTTP_200, response.status)
 
     def test_returns_empty_list_when_db_has_gcs(self) -> None:
         gift_cards = [
@@ -112,6 +120,7 @@ class TestDenominationAPI(MongoDBAndAppAwareTestCase):
             {"status": "ok", "data": expected_denominations},
             response.json,
         )
+        self.assertEqual(falcon.HTTP_200, response.status)
 
     def test_returns_empty_list_when_all_gift_cards_used(self) -> None:
         response = self.simulate_get(self.api_path)
@@ -121,3 +130,59 @@ class TestDenominationAPI(MongoDBAndAppAwareTestCase):
         ]
         self.collection.insert_many(serialized_gift_cards)
         self.assertEqual({"status": "ok", "data": []}, response.json)
+        self.assertEqual(falcon.HTTP_200, response.status)
+
+
+class TestNearExpiryGiftCardAPI(MongoDBAndAppAwareTestCase):
+    def test_returns_404_when_denomination_invalid(self) -> None:
+        response = self.simulate_get("/api/giftcards/denominations/abcd/")
+        self.assertEqual(falcon.HTTP_404, response.status)
+
+    def test_returns_200_when_gift_card_found(self) -> None:
+        gift_cards = [
+            GiftCardFactory(
+                date_of_issue=datetime.date.today().replace(month=month),
+                denomination=200,
+                timestamp=datetime.datetime.now().replace(microsecond=0),
+            )
+            for month in range(1, 13)
+        ]
+        serialized_gift_cards = [
+            prepare_to_be_inserted_gift_card(gc) for gc in gift_cards
+        ]
+        self.collection.insert_many(serialized_gift_cards)
+        response = self.simulate_get("/api/giftcards/denominations/200/")
+        self.assertEqual(falcon.HTTP_200, response.status)
+        expected_gift_card = gift_cards[0]
+        expected_response = {
+            "status": "ok",
+            "data": {
+                "id": str(expected_gift_card.id),
+                "redeem_code": expected_gift_card.redeem_code,
+                "date_of_issue": expected_gift_card.date_of_issue.isoformat(),
+                "pin": expected_gift_card.pin,
+                "source": expected_gift_card.source,
+                "denomination": expected_gift_card.denomination,
+                "timestamp": expected_gift_card.timestamp.isoformat(),
+                "date_of_expiry": expected_gift_card.date_of_expiry.isoformat(),
+                "is_used": expected_gift_card.is_used,
+            },
+        }
+        self.assertEqual(expected_response, response.json)
+
+    def test_returns_404_when_gift_card_invalid(self) -> None:
+        gift_cards = [
+            GiftCardFactory(
+                date_of_issue=datetime.date.today().replace(month=month),
+                denomination=200,
+                timestamp=datetime.datetime.now().replace(microsecond=0),
+                is_used=True,
+            )
+            for month in range(1, 13)
+        ]
+        serialized_gift_cards = [
+            prepare_to_be_inserted_gift_card(gc) for gc in gift_cards
+        ]
+        self.collection.insert_many(serialized_gift_cards)
+        response = self.simulate_get("/api/giftcards/denominations/200/")
+        self.assertEqual(falcon.HTTP_404, response.status)
