@@ -1,6 +1,22 @@
-
-# GCManager
+<div align="center">
+<h1>GCManager💰💸</h1>
+<p>
 A Gift Card Management System
+</p>
+<a href="https://www.python.org/">
+<img src="https://img.shields.io/badge/Made%20with-Python-1f425f.svg">
+</a>
+<a href="https://lbesson.mit-license.org/">
+<img src="https://img.shields.io/badge/License-MIT-blue.svg">
+</a>
+<a href="https://github.com/psf/black">
+<img src="https://img.shields.io/badge/code%20style-black-000000.svg">
+</a>
+<a href="https://codecov.io/gh/vishaltanwar96/GCManager">
+<img src="https://codecov.io/gh/vishaltanwar96/GCManager/branch/main/graph/badge.svg?token=MBJVZ9502A"/>
+</a>
+<img alt="GitHub last commit" src="https://img.shields.io/github/last-commit/vishaltanwar96/GCManager">
+</div>
 
 ## Index
 * [What is this?](#what-is-this)
