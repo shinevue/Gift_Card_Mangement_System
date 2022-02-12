@@ -5,6 +5,7 @@ from falcon.routing.converters import UUIDConverter
 from gcmanager.dependencies import build_dependency_container
 from gcmanager.webapi import DenominationResource
 from gcmanager.webapi import GiftCardAssetInformationResource
+from gcmanager.webapi import GiftCardResource
 from gcmanager.webapi import MarkGiftCardUsedResource
 from gcmanager.webapi import NearExpiryGiftCardResource
 
@@ -29,4 +30,5 @@ def create_app() -> falcon.App:
         "/api/giftcards/denominations/{denomination:int(min=10, max=10000)}/",
         container[NearExpiryGiftCardResource],
     )
+    app.add_route("/api/giftcards/", container[GiftCardResource])
     return app

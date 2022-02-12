@@ -186,3 +186,60 @@ class TestNearExpiryGiftCardAPI(MongoDBAndAppAwareTestCase):
         self.collection.insert_many(serialized_gift_cards)
         response = self.simulate_get("/api/giftcards/denominations/200/")
         self.assertEqual(falcon.HTTP_404, response.status)
+
+
+class TestGiftCardAPI(MongoDBAndAppAwareTestCase):
+    def setUp(self) -> None:
+        super(TestGiftCardAPI, self).setUp()
+        self.api_path = "/api/giftcards/"
+
+    def test_returns_empty_list_when_db_empty(self) -> None:
+        response = self.simulate_get(self.api_path)
+        expected_response = {"status": "ok", "data": []}
+        self.assertEqual(falcon.HTTP_200, response.status)
+        self.assertDictEqual(expected_response, response.json)
+
+    def test_returns_expected_response_when_unused_gift_cards_found(self) -> None:
+        gift_cards_unused = GiftCardFactory.build_batch(
+            5,
+            timestamp=datetime.datetime.now().replace(microsecond=0),
+        )
+        gift_cards_used = GiftCardFactory.build_batch(5, is_used=True)
+        serialized_gift_cards = [
+            prepare_to_be_inserted_gift_card(gc)
+            for gc in gift_cards_used + gift_cards_unused
+        ]
+        self.collection.insert_many(serialized_gift_cards)
+        response = self.simulate_get(self.api_path)
+        expected_data = [
+            {
+                "id": str(expected_gift_card.id),
+                "redeem_code": expected_gift_card.redeem_code,
+                "date_of_issue": expected_gift_card.date_of_issue.isoformat(),
+                "pin": expected_gift_card.pin,
+                "source": expected_gift_card.source,
+                "denomination": expected_gift_card.denomination,
+                "timestamp": expected_gift_card.timestamp.isoformat(),
+                "date_of_expiry": expected_gift_card.date_of_expiry.isoformat(),
+                "is_used": expected_gift_card.is_used,
+            }
+            for expected_gift_card in gift_cards_unused
+        ]
+        expected_response = {"status": "ok", "data": expected_data}
+        self.assertEqual(falcon.HTTP_200, response.status)
+        self.assertDictEqual(expected_response, response.json)
+
+    def test_returns_empty_list_when_unused_gcs_not_found(self) -> None:
+        gift_cards = GiftCardFactory.build_batch(
+            5,
+            timestamp=datetime.datetime.now().replace(microsecond=0),
+            is_used=True,
+        )
+        serialized_gift_cards = [
+            prepare_to_be_inserted_gift_card(gc) for gc in gift_cards
+        ]
+        self.collection.insert_many(serialized_gift_cards)
+        response = self.simulate_get(self.api_path)
+        expected_response = {"status": "ok", "data": []}
+        self.assertEqual(falcon.HTTP_200, response.status)
+        self.assertDictEqual(expected_response, response.json)
