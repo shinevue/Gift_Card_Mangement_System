@@ -31,4 +31,8 @@ def create_app() -> falcon.App:
         container[NearExpiryGiftCardResource],
     )
     app.add_route("/api/giftcards/", container[GiftCardResource])
+    app.add_route(
+        "/api/giftcards/{gift_card_id:giftcardid}/",
+        container[GiftCardResource],
+    )
     return app
