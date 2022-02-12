@@ -6,10 +6,7 @@ on:
       - main
 jobs:
   ci:
-    strategy:
-      matrix:
-        os: [ubuntu-latest, macos-11]
-    runs-on: ${{ matrix.os }}
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout Code Repo
         uses: actions/checkout@v2
@@ -25,7 +22,7 @@ jobs:
       - name: Install Dependencies
         run: poetry install --no-root --no-interaction
       - name: Style Check (black)
-        run: poetry run black . --check --verbose
+        run: poetry run black . --check --verbose --diff --color
       - name: Imports Sorting Check (isort)
         run: poetry run isort . --check --diff
       - name: Type Check (mypy)
@@ -34,6 +31,13 @@ jobs:
         run: poetry run flake8 .
       - name: Common Security Checks (bandit)
         run: poetry run bandit -r gcmanager tests --verbose
+      - name: Start MongoDB
+        uses: supercharge/mongodb-github-action@1.7.0
+        with:
+          mongodb-version: '5.0.6'
+          mongodb-username: testing_user
+          mongodb-password: testing
+          mongodb-port: 27020
       - name: Testing
         run: |
           poetry run coverage erase

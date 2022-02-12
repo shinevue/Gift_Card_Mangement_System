@@ -62,8 +62,11 @@ class MarkGiftCardUsedUseCase:
         self._repository = repository
 
     def mark_used(self, gift_card_id: GiftCardID) -> None:
-        if not self._repository.get_by_id(gift_card_id):
+        gift_card = self._repository.get_by_id(gift_card_id)
+        if not gift_card:
             raise GiftCardNotFound
+        if gift_card.is_used:
+            raise GiftCardAlreadyUsed
         self._repository.mark_used(gift_card_id)
 
 

@@ -19,10 +19,10 @@ from gcmanager.webapi import GiftCardAssetInformationResource
 from gcmanager.webapi import GiftCardResource
 from gcmanager.webapi import MarkGiftCardUsedResource
 from gcmanager.webapi import NearExpiryGiftCardResource
-from tests.unit.factories import GiftCardCreateRequestFactory
-from tests.unit.factories import GiftCardFactory
-from tests.unit.factories import GiftCardPayloadFactory
-from tests.unit.factories import GiftCardUpdateRequestFactory
+from tests.factories import GiftCardCreateRequestFactory
+from tests.factories import GiftCardFactory
+from tests.factories import GiftCardPayloadFactory
+from tests.factories import GiftCardUpdateRequestFactory
 
 
 class TestGiftCardAssetInformationResource(TestCase):
@@ -51,7 +51,6 @@ class TestGiftCardAssetInformationResource(TestCase):
 
 class TestGiftCardResource(TestCase):
     def setUp(self) -> None:
-        self.maxDiff = None
         self.create_use_case = mock()
         self.get_unused_gc_use_case = mock()
         self.update_gc_use_case = mock()
@@ -312,5 +311,12 @@ class TestMarkGiftCardUsedResource(TestCase):
         request = falcon.testing.create_req()
         response = falcon.Response()
         when(self.use_case).mark_used(self.gift_card.id).thenRaise(GiftCardNotFound)
+        with self.assertRaises(errors.HTTPBadRequest):
+            self.resource.on_post(request, response, self.gift_card.id)
+
+    def test_raises_400_when_gift_card_already_used(self) -> None:
+        request = falcon.testing.create_req()
+        response = falcon.Response()
+        when(self.use_case).mark_used(self.gift_card.id).thenRaise(GiftCardAlreadyUsed)
         with self.assertRaises(errors.HTTPBadRequest):
             self.resource.on_post(request, response, self.gift_card.id)

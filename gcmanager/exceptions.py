@@ -12,3 +12,7 @@ class GiftCardNotFoundForDenomination(GiftCardNotFound):
 
 class GiftCardAlreadyUsed(Exception):
     pass
+
+
+class ImproperlyConfigured(Exception):
+    pass
