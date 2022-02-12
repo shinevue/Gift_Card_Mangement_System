@@ -8,8 +8,7 @@ from tests.integration.utils import prepare_to_be_inserted_gift_card
 
 
 class TestGiftCardAssetInformationAPI(MongoDBAndAppAwareTestCase):
-    def setUp(self) -> None:
-        super(TestGiftCardAssetInformationAPI, self).setUp()
+    def setUpExtended(self) -> None:
         self.api_path = "/api/giftcards/assets/"
 
     def test_returns_zero_for_all_when_db_empty(self) -> None:
@@ -85,8 +84,7 @@ class TestMarkGiftCardUsedAPI(MongoDBAndAppAwareTestCase):
 
 
 class TestDenominationAPI(MongoDBAndAppAwareTestCase):
-    def setUp(self) -> None:
-        super(TestDenominationAPI, self).setUp()
+    def setUpExtended(self) -> None:
         self.api_path = "/api/giftcards/denominations/"
 
     def test_returns_empty_list_when_db_empty(self) -> None:
@@ -189,8 +187,7 @@ class TestNearExpiryGiftCardAPI(MongoDBAndAppAwareTestCase):
 
 
 class TestGiftCardAPI(MongoDBAndAppAwareTestCase):
-    def setUp(self) -> None:
-        super(TestGiftCardAPI, self).setUp()
+    def setUpExtended(self) -> None:
         self.api_path = "/api/giftcards/"
 
     def test_returns_empty_list_when_db_empty(self) -> None:
