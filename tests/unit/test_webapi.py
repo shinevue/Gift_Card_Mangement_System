@@ -51,7 +51,6 @@ class TestGiftCardAssetInformationResource(TestCase):
 
 class TestGiftCardResource(TestCase):
     def setUp(self) -> None:
-        self.maxDiff = None
         self.create_use_case = mock()
         self.get_unused_gc_use_case = mock()
         self.update_gc_use_case = mock()

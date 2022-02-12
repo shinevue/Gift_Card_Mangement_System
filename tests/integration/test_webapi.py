@@ -240,3 +240,18 @@ class TestGiftCardAPI(MongoDBAndAppAwareTestCase):
         expected_response = {"status": "ok", "data": []}
         self.assertEqual(falcon.HTTP_200, response.status)
         self.assertDictEqual(expected_response, response.json)
+
+    def test_returns_400_when_gift_card_already_exists(self) -> None:
+        gift_card = GiftCardFactory()
+        self.collection.insert_one(prepare_to_be_inserted_gift_card(gift_card))
+        response = self.simulate_post(
+            self.api_path,
+            json={
+                "redeem_code": gift_card.redeem_code,
+                "date_of_issue": gift_card.date_of_issue.isoformat(),
+                "pin": gift_card.pin,
+                "source": gift_card.source,
+                "denomination": gift_card.denomination,
+            },
+        )
+        self.assertEqual(falcon.HTTP_400, response.status)

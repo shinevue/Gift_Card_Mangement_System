@@ -163,7 +163,10 @@ class GiftCardMongoDBRepository(GiftCardRepository):
         return GiftCard(**{"id": gc_id, "date_of_issue": date_of_issue, **gc_dict})
 
     def get_by_redeem_code(self, redeem_code: RedeemCode) -> Optional[GiftCard]:
-        pass
+        gc_dict = self._collection.find_one({"redeem_code": redeem_code})
+        if not gc_dict:
+            return None
+        return self._make_gc(gc_dict)
 
     def create(self, gift_card: GiftCard) -> None:
         pass
