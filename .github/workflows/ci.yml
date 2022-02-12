@@ -6,10 +6,7 @@ on:
       - main
 jobs:
   ci:
-    strategy:
-      matrix:
-        os: [ubuntu-latest, macos-11]
-    runs-on: ${{ matrix.os }}
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout Code Repo
         uses: actions/checkout@v2
