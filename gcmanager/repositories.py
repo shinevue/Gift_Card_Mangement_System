@@ -137,7 +137,7 @@ class GiftCardMongoDBRepository(GiftCardRepository):
         result = list(
             self._collection.find({"is_used": False})
             .sort("date_of_issue", ASCENDING)
-            .limit(1)
+            .limit(1),
         )
         if not result:
             return None
@@ -169,4 +169,5 @@ class GiftCardMongoDBRepository(GiftCardRepository):
         pass
 
     def get_unused(self) -> list[GiftCard]:
-        pass
+        unused_gift_cards = list(self._collection.find({"is_used": False}))
+        return [self._make_gc(gc) for gc in unused_gift_cards]
