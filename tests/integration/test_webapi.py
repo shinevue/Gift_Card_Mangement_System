@@ -255,3 +255,24 @@ class TestGiftCardAPI(MongoDBAndAppAwareTestCase):
             },
         )
         self.assertEqual(falcon.HTTP_400, response.status)
+
+    def test_returns_201_when_gift_card_created_successfully(self) -> None:
+        gift_card = GiftCardFactory()
+        response = self.simulate_post(
+            self.api_path,
+            json={
+                "redeem_code": gift_card.redeem_code,
+                "date_of_issue": gift_card.date_of_issue.isoformat(),
+                "pin": gift_card.pin,
+                "source": gift_card.source,
+                "denomination": gift_card.denomination,
+            },
+        )
+        self.assertEqual(falcon.HTTP_201, response.status)
+        self.assertEqual(1, self.collection.count_documents({}))
+        self.assertEqual(
+            gift_card.redeem_code,
+            self.collection.find_one({"redeem_code": gift_card.redeem_code})[
+                "redeem_code"
+            ],
+        )

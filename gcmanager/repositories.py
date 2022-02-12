@@ -2,6 +2,7 @@ import datetime
 import uuid
 from abc import ABC
 from abc import abstractmethod
+from dataclasses import asdict
 from typing import Optional
 
 from pymongo import ASCENDING
@@ -115,10 +116,10 @@ class GiftCardMongoDBRepository(GiftCardRepository):
         return GiftCardAssetSummary(total=Money(total), used=Money(used))
 
     def next_id(self) -> uuid.UUID:
-        pass
+        return uuid.uuid4()
 
     def timestamp(self) -> datetime.datetime:
-        pass
+        return datetime.datetime.now()
 
     def get_available_denominations(self) -> list[Denomination]:
         aggregation = self._collection.aggregate(
@@ -169,7 +170,20 @@ class GiftCardMongoDBRepository(GiftCardRepository):
         return self._make_gc(gc_dict)
 
     def create(self, gift_card: GiftCard) -> None:
-        pass
+        serialized_gift_card = asdict(gift_card)
+        date_of_issue = serialized_gift_card.pop("date_of_issue")
+        serialized_gift_card["date_of_issue"] = datetime.datetime(
+            year=date_of_issue.year,
+            month=date_of_issue.month,
+            day=date_of_issue.day,
+            hour=0,
+            minute=0,
+            second=0,
+            microsecond=0,
+        )
+        identity = serialized_gift_card.pop("id")
+        serialized_gift_card.update({"_id": identity})
+        self._collection.insert_one(serialized_gift_card)
 
     def get_unused(self) -> list[GiftCard]:
         unused_gift_cards = list(self._collection.find({"is_used": False}))
