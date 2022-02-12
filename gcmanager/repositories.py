@@ -146,7 +146,26 @@ class GiftCardMongoDBRepository(GiftCardRepository):
         return self._make_gc(gift_card_dict)
 
     def update(self, gift_card_request: GiftCardUpdateRequest) -> None:
-        pass
+        date_of_issue = datetime.datetime(
+            year=gift_card_request.date_of_issue.year,
+            month=gift_card_request.date_of_issue.month,
+            day=gift_card_request.date_of_issue.day,
+            hour=0,
+            minute=0,
+            microsecond=0,
+        )
+        self._collection.update_one(
+            {"_id": gift_card_request.id},
+            {
+                "$set": {
+                    "redeem_code": gift_card_request.redeem_code,
+                    "pin": gift_card_request.pin,
+                    "source": gift_card_request.source,
+                    "denomination": gift_card_request.denomination,
+                    "date_of_issue": date_of_issue,
+                },
+            },
+        )
 
     def mark_used(self, gift_card_id: GiftCardID) -> None:
         self._collection.update_one({"_id": gift_card_id}, {"$set": {"is_used": True}})
