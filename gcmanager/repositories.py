@@ -70,36 +70,47 @@ class GiftCardMongoDBRepository(GiftCardRepository):
         self._collection = gc_collection
 
     def get_summary(self) -> GiftCardAssetSummary:
-        total_aggregation = list(
+        aggregation_result = list(
             self._collection.aggregate(
                 [
-                    {"$group": {"_id": None, "total": {"$sum": "$denomination"}}},
-                    {"$project": {"_id": 0}},
+                    {
+                        "$facet": {
+                            "total": [
+                                {
+                                    "$group": {
+                                        "_id": None,
+                                        "amount": {"$sum": "$denomination"},
+                                    },
+                                },
+                                {"$project": {"_id": 0}},
+                            ],
+                            "used": [
+                                {"$match": {"is_used": True}},
+                                {
+                                    "$group": {
+                                        "_id": None,
+                                        "amount": {"$sum": "$denomination"},
+                                    },
+                                },
+                                {"$project": {"_id": 0}},
+                            ],
+                        },
+                    },
                 ],
             ),
-        )
-
+        )[0]
+        total_aggregation = aggregation_result["total"]
         if not total_aggregation:
             return GiftCardAssetSummary(
                 total=Money(0),
                 used=Money(0),
             )
-
-        used_aggregation = list(
-            self._collection.aggregate(
-                [
-                    {"$match": {"is_used": True}},
-                    {"$group": {"_id": None, "used": {"$sum": "$denomination"}}},
-                    {"$project": {"_id": 0}},
-                ],
-            ),
-        )
-
-        total = total_aggregation[0]["total"]
+        used_aggregation = aggregation_result["used"]
+        total = total_aggregation[0]["amount"]
         if not used_aggregation:
             used = 0
         else:
-            used = used_aggregation[0]["used"]
+            used = used_aggregation[0]["amount"]
 
         return GiftCardAssetSummary(total=Money(total), used=Money(used))
 
