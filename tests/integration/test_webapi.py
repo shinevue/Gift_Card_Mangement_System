@@ -276,3 +276,71 @@ class TestGiftCardAPI(MongoDBAndAppAwareTestCase):
                 "redeem_code"
             ],
         )
+
+    def test_returns_404_when_on_update_when_gift_card_not_found(self) -> None:
+        gift_card = GiftCardFactory()
+        response = self.simulate_put(
+            f"/api/giftcards/{gift_card.id}/",
+            json={
+                "redeem_code": gift_card.redeem_code,
+                "date_of_issue": gift_card.date_of_issue.isoformat(),
+                "pin": gift_card.pin,
+                "source": gift_card.source,
+                "denomination": gift_card.denomination,
+            },
+        )
+        self.assertEqual(falcon.HTTP_404, response.status)
+
+    def test_returns_400_when_on_update_when_gift_card_already_used(self) -> None:
+        gift_card = GiftCardFactory(is_used=True)
+        self.collection.insert_one(prepare_to_be_inserted_gift_card(gift_card))
+        response = self.simulate_put(
+            f"/api/giftcards/{gift_card.id}/",
+            json={
+                "redeem_code": gift_card.redeem_code,
+                "date_of_issue": gift_card.date_of_issue.isoformat(),
+                "pin": gift_card.pin,
+                "source": gift_card.source,
+                "denomination": gift_card.denomination,
+            },
+        )
+        self.assertEqual(falcon.HTTP_400, response.status)
+
+    def test_returns_200_and_updates_as_expected_when_called_on_update(self) -> None:
+        gift_card = GiftCardFactory(
+            timestamp=datetime.datetime.now().replace(microsecond=0),
+        )
+        self.collection.insert_one(prepare_to_be_inserted_gift_card(gift_card))
+        gift_card_update_with = GiftCardFactory(id=gift_card.id)
+        response = self.simulate_put(
+            f"/api/giftcards/{gift_card.id}/",
+            json={
+                "redeem_code": gift_card_update_with.redeem_code,
+                "date_of_issue": gift_card_update_with.date_of_issue.isoformat(),
+                "pin": gift_card_update_with.pin,
+                "source": gift_card_update_with.source,
+                "denomination": gift_card_update_with.denomination,
+            },
+        )
+        date_of_issue = datetime.datetime(
+            year=gift_card_update_with.date_of_issue.year,
+            month=gift_card_update_with.date_of_issue.month,
+            day=gift_card_update_with.date_of_issue.day,
+            hour=0,
+            minute=0,
+            microsecond=0,
+        )
+        self.assertEqual(falcon.HTTP_200, response.status)
+        self.assertDictEqual(
+            {
+                "_id": gift_card.id,
+                "redeem_code": gift_card_update_with.redeem_code,
+                "date_of_issue": date_of_issue,
+                "pin": gift_card_update_with.pin,
+                "source": gift_card_update_with.source,
+                "denomination": gift_card_update_with.denomination,
+                "timestamp": gift_card.timestamp,
+                "is_used": False,
+            },
+            self.collection.find_one({"_id": gift_card.id}),
+        )
