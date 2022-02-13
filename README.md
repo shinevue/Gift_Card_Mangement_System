@@ -15,6 +15,7 @@ A Gift Card Management System
 <a href="https://codecov.io/gh/vishaltanwar96/GCManager">
 <img src="https://codecov.io/gh/vishaltanwar96/GCManager/branch/main/graph/badge.svg?token=MBJVZ9502A"/>
 </a>
+<img src="https://github.com/vishaltanwar96/GCManager/actions/workflows/ci.yml/badge.svg"/>
 <img alt="GitHub last commit" src="https://img.shields.io/github/last-commit/vishaltanwar96/GCManager">
 </div>
 
