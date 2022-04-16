@@ -39,10 +39,11 @@ class ProdAppSettings(AppSettings):
                 "MONGODB_USERNAME": os.environ.get("MONGODB_USERNAME"),
                 "MONGODB_PASSWORD": os.environ.get("MONGODB_PASSWORD"),
                 "MONGODB_HOST": os.environ.get("MONGODB_HOST"),
-                "MONGODB_PORT": os.environ.get("MONGODB_PORT"),
-                "MONGODB_DBNAME": os.environ.get("MONGODB_DBNAME"),
+                "MONGODB_PORT": os.environ.get("MONGODB_PORT", "27017"),
+                "MONGODB_DBNAME": os.environ.get("MONGODB_DBNAME", "gcmanager"),
                 "MONGODB_GC_COLLECTION_NAME": os.environ.get(
                     "MONGODB_GC_COLLECTION_NAME",
+                    "giftcards",
                 ),
             },
         )
