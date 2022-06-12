@@ -6,7 +6,7 @@ authors = ["Vishal Tanwar <vishal.tanwar@outlook.com>"]
 license = "MIT"
 
 [tool.poetry.dependencies]
-python = "3.10.0"
+python = "3.10.4"
 kink = "^0.6.2"
 falcon = "^3.0.1"
 marshmallow = "^3.14.1"
