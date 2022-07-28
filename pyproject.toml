@@ -14,7 +14,6 @@ pymongo = "^4.0.1"
 
 [tool.poetry.dev-dependencies]
 coverage = "^6.2"
-black = "^21.12b0"
 isort = "^5.10.1"
 flake8 = "^4.0.1"
 bandit = "^1.7.1"
@@ -22,6 +21,7 @@ add-trailing-comma = "^2.2.1"
 mypy = "^0.930"
 mockito = "^1.3.0"
 factory-boy = "^3.2.1"
+black = "^22.6.0"
 
 [tool.isort]
 profile = "black"

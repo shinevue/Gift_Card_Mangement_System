@@ -1,6 +1,6 @@
 fail_fast: true
 default_language_version:
-    python: python3.10.0
+    python: python3.10
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v4.1.0
@@ -23,7 +23,7 @@ repos:
       - id: isort
         name: isort (Python)
   - repo: https://github.com/psf/black
-    rev: 21.12b0
+    rev: 22.6.0
     hooks:
       - id: black
         name: Black
