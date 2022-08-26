@@ -81,6 +81,17 @@ Run only integration tests:
 python -m unittest discover tests/integration --verbose
 ```
 
+## Running the project locally:
+Run MongoDB using docker-compose:
+```bash
+docker-compose -f mongo-for-testing.yml up -d
+```
+
+Using gunicorn:
+```bash
+gunicorn -w 1 --reload "gcmanager.app:create_app()" -e APP_ENV=TEST
+```
+
 ## Index
 * [What is this?](#what-is-this)
 * [Why is this needed?](#why-is-this-needed)
