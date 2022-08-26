@@ -21,7 +21,7 @@ A Gift Card Management System
 
 ## A little about the system
 * The system is built with [Clean Architecture](https://blog.cleancoder.com/uncle-bob/2012/08/13/the-clean-architecture.html) and follows [Test Driven Development](https://rubikscode.net/2021/05/24/test-driven-development-tdd-with-python/).
-* It heavily uses design patterns like [Dependency Injection](https://en.wikipedia.org/wiki/Dependency_injection), [Strategy](https://en.wikipedia.org/wiki/Strategy_pattern) and [Command](https://en.wikipedia.org/wiki/Command_pattern).
+* It heavily uses design patterns like [Dependency Injection](https://en.wikipedia.org/wiki/Dependency_injection), [Strategy](https://en.wikipedia.org/wiki/Strategy_pattern) and [Parameter Object](https://refactoring.guru/introduce-parameter-object).
 * We aim for 100% [code coverage](https://www.atlassian.com/continuous-delivery/software-testing/code-coverage).
 * Mocks are the preffered way of [mocking](https://microsoft.github.io/code-with-engineering-playbook/automated-testing/unit-testing/mocking/) dependencies in unit tests as we want to test our components in a controlled environment.
 
