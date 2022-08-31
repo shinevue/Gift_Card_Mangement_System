@@ -30,7 +30,7 @@ jobs:
       - name: Lint Check (flake8)
         run: poetry run flake8 .
       - name: Common Security Checks (bandit)
-        run: poetry run bandit -r gcmanager tests --verbose
+        run: poetry run bandit -r gcmanager --verbose
       - name: Start MongoDB
         uses: supercharge/mongodb-github-action@1.7.0
         with:

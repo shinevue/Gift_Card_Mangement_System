@@ -1,4 +1,6 @@
+import calendar
 import datetime
+import random
 
 import falcon
 
@@ -137,9 +139,15 @@ class TestNearExpiryGiftCardAPI(MongoDBAndAppAwareTestCase):
         self.assertEqual(falcon.HTTP_404, response.status)
 
     def test_returns_200_when_gift_card_found(self) -> None:
+        today = datetime.date.today()
         gift_cards = [
             GiftCardFactory(
-                date_of_issue=datetime.date.today().replace(month=month),
+                date_of_issue=today.replace(
+                    day=random.randint(
+                        1, calendar.monthrange(year=today.year, month=month)[1]
+                    ),
+                    month=month,
+                ),
                 denomination=200,
                 timestamp=datetime.datetime.now().replace(microsecond=0),
             )
@@ -169,9 +177,15 @@ class TestNearExpiryGiftCardAPI(MongoDBAndAppAwareTestCase):
         self.assertEqual(expected_response, response.json)
 
     def test_returns_404_when_gift_card_invalid(self) -> None:
+        today = datetime.date.today()
         gift_cards = [
             GiftCardFactory(
-                date_of_issue=datetime.date.today().replace(month=month),
+                date_of_issue=today.replace(
+                    day=random.randint(
+                        1, calendar.monthrange(year=today.year, month=month)[1]
+                    ),
+                    month=month,
+                ),
                 denomination=200,
                 timestamp=datetime.datetime.now().replace(microsecond=0),
                 is_used=True,
