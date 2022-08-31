@@ -3,7 +3,7 @@ build:
 	isort . --check --diff
 	mypy
 	flake8 .
-	bandit -r gcmanager tests --verbose
+	bandit -r gcmanager --verbose
 	docker-compose -f mongo-for-testing.yml up -d
 	coverage erase
 	coverage run -mp unittest discover tests/unit --verbose
