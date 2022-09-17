@@ -27,7 +27,6 @@ jobs:
       - name: "Build and Publish Image to DockerHub"
         uses: docker/build-push-action@v3
         with:
-          context: .
           push: true
           tags: ${{ steps.metadata.outputs.tags }}
           labels: ${{ steps.metadata.outputs.labels }}
