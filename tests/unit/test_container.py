@@ -24,12 +24,12 @@ class TestDependencyContainer(TestCase):
 
     def test_returns_container_when_required_env_variables_present(self) -> None:
         when(os.environ).get("APP_ENV").thenReturn("PROD")
-        when(os.environ).get("MONGODB_USERNAME").thenReturn("someuser")
-        when(os.environ).get("MONGODB_PASSWORD").thenReturn("somepassword")
-        when(os.environ).get("MONGODB_HOST").thenReturn("somehost")
-        when(os.environ).get("MONGODB_PORT", "27017").thenReturn("27017")
-        when(os.environ).get("MONGODB_DBNAME", "gcmanager").thenReturn("somedb")
+        when(os.environ).get("MONGODB_USERNAME").thenReturn("testing_user")
+        when(os.environ).get("MONGODB_PASSWORD").thenReturn("testing")
+        when(os.environ).get("MONGODB_HOST").thenReturn("localhost")
+        when(os.environ).get("MONGODB_PORT", "27017").thenReturn("27020")
+        when(os.environ).get("MONGODB_DBNAME", "gcmanager").thenReturn("testdb")
         when(os.environ).get("MONGODB_GC_COLLECTION_NAME", "giftcards").thenReturn(
-            "somecollection",
+            "testcollection",
         )
         self.assertIsInstance(build_dependency_container(), Container)
