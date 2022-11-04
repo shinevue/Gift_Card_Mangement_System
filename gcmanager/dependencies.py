@@ -2,6 +2,7 @@ import os
 from urllib.parse import quote
 
 from kink import Container
+from pymongo import ASCENDING
 from pymongo import MongoClient
 from pymongo.collection import Collection
 from pymongo.database import Database
@@ -61,7 +62,9 @@ def _build_mongodb_database(container: Container) -> None:
 def _build_mongodb_collection(container: Container) -> None:
     database = container[Database]
     settings = container[Settings]
-    container[Collection] = lambda c: database[settings["MONGODB_GC_COLLECTION_NAME"]]
+    collection = database[settings["MONGODB_GC_COLLECTION_NAME"]]
+    collection.create_index([("redeem_code", ASCENDING)], unique=True)
+    container[Collection] = lambda c: collection
 
 
 def _build_mongodb_repository(container: Container) -> None:
