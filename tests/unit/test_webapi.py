@@ -144,9 +144,11 @@ class TestGiftCardResource(TestCase):
         for payload in payloads:
             request = testing.create_req(body=json.dumps(payload, default=str))
             response = falcon.Response()
-            with self.subTest(payload=payload):
-                with self.assertRaises(errors.HTTPBadRequest):
-                    self.resource.on_post(request, response)
+            with (
+                self.subTest(payload=payload),
+                self.assertRaises(errors.HTTPBadRequest),
+            ):
+                self.resource.on_post(request, response)
 
     def test_returns_200_when_gift_card_updated_successfully(self) -> None:
         update_request = GiftCardUpdateRequestFactory()
@@ -218,9 +220,11 @@ class TestGiftCardResource(TestCase):
             )
             request = testing.create_req(body=json.dumps(payload, default=str))
             response = falcon.Response()
-            with self.subTest(payload=payload):
-                with self.assertRaises(errors.HTTPBadRequest):
-                    self.resource.on_put(request, response, update_request.id)
+            with (
+                self.subTest(payload=payload),
+                self.assertRaises(errors.HTTPBadRequest),
+            ):
+                self.resource.on_put(request, response, update_request.id)
 
 
 class TestDenominationResource(TestCase):

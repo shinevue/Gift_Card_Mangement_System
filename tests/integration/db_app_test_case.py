@@ -28,7 +28,7 @@ class MongoDBAndAppAwareTestCase(TestCase):
         cls.db_client.close()
 
     def setUp(self) -> None:
-        super(MongoDBAndAppAwareTestCase, self).setUp()
+        super().setUp()
         self.app = create_app()
         self.db = self.db_client["testdb"]
         self.collection = self.db["testcollection"]

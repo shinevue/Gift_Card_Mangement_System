@@ -3,7 +3,6 @@ import uuid
 from abc import ABC
 from abc import abstractmethod
 from dataclasses import asdict
-from typing import Optional
 
 from pymongo import ASCENDING
 from pymongo.collection import Collection
@@ -34,7 +33,7 @@ class GiftCardRepository(ABC):
     def get_near_expiry_gift_card(
         self,
         denomination: Denomination,
-    ) -> Optional[GiftCard]:
+    ) -> GiftCard | None:
         pass
 
     @abstractmethod
@@ -46,11 +45,11 @@ class GiftCardRepository(ABC):
         pass
 
     @abstractmethod
-    def get_by_id(self, gift_card_id: GiftCardID) -> Optional[GiftCard]:
+    def get_by_id(self, gift_card_id: GiftCardID) -> GiftCard | None:
         pass
 
     @abstractmethod
-    def get_by_redeem_code(self, redeem_code: RedeemCode) -> Optional[GiftCard]:
+    def get_by_redeem_code(self, redeem_code: RedeemCode) -> GiftCard | None:
         pass
 
     @abstractmethod
@@ -108,11 +107,7 @@ class GiftCardMongoDBRepository(GiftCardRepository):
             )
         used_aggregation = aggregation_result["used"]
         total = total_aggregation[0]["amount"]
-        if not used_aggregation:
-            used = 0
-        else:
-            used = used_aggregation[0]["amount"]
-
+        used = 0 if not used_aggregation else used_aggregation[0]["amount"]
         return GiftCardAssetSummary(total=Money(total), used=Money(used))
 
     def next_id(self) -> uuid.UUID:
@@ -134,7 +129,7 @@ class GiftCardMongoDBRepository(GiftCardRepository):
     def get_near_expiry_gift_card(
         self,
         denomination: Denomination,
-    ) -> Optional[GiftCard]:
+    ) -> GiftCard | None:
         result = list(
             self._collection.find({"is_used": False})
             .sort("date_of_issue", ASCENDING)
@@ -170,7 +165,7 @@ class GiftCardMongoDBRepository(GiftCardRepository):
     def mark_used(self, gift_card_id: GiftCardID) -> None:
         self._collection.update_one({"_id": gift_card_id}, {"$set": {"is_used": True}})
 
-    def get_by_id(self, gift_card_id: GiftCardID) -> Optional[GiftCard]:
+    def get_by_id(self, gift_card_id: GiftCardID) -> GiftCard | None:
         gc_dict = self._collection.find_one({"_id": gift_card_id})
         if not gc_dict:
             return None
@@ -182,7 +177,7 @@ class GiftCardMongoDBRepository(GiftCardRepository):
         date_of_issue = gc_dict.pop("date_of_issue").date()
         return GiftCard(**{"id": gc_id, "date_of_issue": date_of_issue, **gc_dict})
 
-    def get_by_redeem_code(self, redeem_code: RedeemCode) -> Optional[GiftCard]:
+    def get_by_redeem_code(self, redeem_code: RedeemCode) -> GiftCard | None:
         gc_dict = self._collection.find_one({"redeem_code": redeem_code})
         if not gc_dict:
             return None

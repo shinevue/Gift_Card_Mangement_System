@@ -37,12 +37,7 @@ def _build_mongo_db_connection_string(container: Container) -> str:
             "environment variables required to "
             "build mongodb connection string are missing",
         )
-    return "mongodb://%s:%s@%s:%s/" % (
-        quote(username),
-        quote(password),
-        host,
-        port,
-    )
+    return f"mongodb://{quote(username)}:{quote(password)}@{host}:{port}/"
 
 
 def _build_mongodb_client(container: Container) -> None:

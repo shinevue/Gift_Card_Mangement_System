@@ -144,7 +144,8 @@ class TestNearExpiryGiftCardAPI(MongoDBAndAppAwareTestCase):
             GiftCardFactory(
                 date_of_issue=today.replace(
                     day=random.randint(
-                        1, calendar.monthrange(year=today.year, month=month)[1]
+                        1,
+                        calendar.monthrange(year=today.year, month=month)[1],
                     ),
                     month=month,
                 ),
@@ -182,7 +183,8 @@ class TestNearExpiryGiftCardAPI(MongoDBAndAppAwareTestCase):
             GiftCardFactory(
                 date_of_issue=today.replace(
                     day=random.randint(
-                        1, calendar.monthrange(year=today.year, month=month)[1]
+                        1,
+                        calendar.monthrange(year=today.year, month=month)[1],
                     ),
                     month=month,
                 ),
