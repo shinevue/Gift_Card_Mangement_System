@@ -2,7 +2,6 @@ import os
 from abc import ABC
 from abc import abstractmethod
 from typing import NewType
-from typing import Type
 
 from gcmanager.enums import AppEnvironment
 
@@ -49,7 +48,7 @@ class ProdAppSettings(AppSettings):
         )
 
 
-def settings_selector(enviroment: AppEnvironment) -> Type[AppSettings]:
+def settings_selector(enviroment: AppEnvironment) -> type[AppSettings]:
     env_settings_map = {
         AppEnvironment.TEST: TestAppSettings,
         AppEnvironment.PROD: ProdAppSettings,

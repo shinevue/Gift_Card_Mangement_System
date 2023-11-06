@@ -17,18 +17,18 @@ jobs:
       - name: Install and configure Poetry
         uses: snok/install-poetry@v1
         with:
-          version: 1.1.12
+          version: 1.6.1
           virtualenvs-create: false
       - name: Install Dependencies
         run: poetry install --no-root --no-interaction
       - name: Style Check (black)
-        run: poetry run black . --check --verbose --diff --color
+        run: poetry run black gcmanager/ tests/ --check --verbose --diff --color
       - name: Imports Sorting Check (isort)
-        run: poetry run isort . --check --diff
+        run: poetry run isort gcmanager/ tests/ --check --diff
       - name: Type Check (mypy)
         run: poetry run mypy
-      - name: Lint Check (flake8)
-        run: poetry run flake8 .
+      - name: Lint Check (Ruff)
+        run: poetry run ruff gcmanager/ tests/
       - name: Common Security Checks (bandit)
         run: poetry run bandit -r gcmanager --verbose
       - name: Start MongoDB
